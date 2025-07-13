@@ -1,0 +1,516 @@
+﻿Imports System.IO
+Imports System.Xml.Serialization
+Imports System.Windows.Forms ' Assure-toi que cette importation est présente pour les contrôles UI
+Imports System.Globalization ' Pour TimeSpan.TryParseExact
+Imports iTextSharp.text ' Pour les classes de base (Document, Paragraph, etc.)
+Imports iTextSharp.text.pdf ' Pour PdfWriter, PdfPTable, etc.
+
+Public Class Form1
+
+    ' Variable pour stocker le projet de chorégraphie actuellement chargé/créé
+    Private currentProjet As ProjetChoregraphique
+
+    ' Variable pour stocker le chemin du fichier du projet actuel
+    Private currentFilePath As String = String.Empty
+
+    ' Variable pour savoir si des modifications non enregistrées existent
+    Private isDirty As Boolean = False
+    Private bsCombattantsDisplay As New BindingSource()
+    Private bsAssistantsDisplay As New BindingSource()
+
+    ' Nous n'utiliserons pas de BindingSource directement avec RichTextBox,
+    ' car RichTextBox est pour du texte formaté, pas une liste d'objets.
+    ' La gestion des combattants et assistants sera manuelle pour l'instant
+    ' jusqu'à ce que nous implémentions des dialogues d'édition dédiés.
+
+    Private Sub Form1_Load(sender As Object, e As EventArgs) Handles MyBase.Load
+
+        ' Lier la ListBox des combattants
+        lstCombattants.DataSource = bsCombattantsDisplay
+        lstCombattants.DisplayMember = "ToString" ' Utilise la fonction ToString() de Combattant
+
+        ' Lier la ListBox des assistants
+        lstAssistantsDisplay.DataSource = bsAssistantsDisplay
+        lstAssistantsDisplay.DisplayMember = "ToString" ' Utilise la fonction ToString() de Assistant
+
+        NewProject()
+    End Sub
+
+    Private Sub NewProject()
+        currentProjet = New ProjetChoregraphique()
+        currentFilePath = String.Empty
+        isDirty = False
+        UpdateFormTitle()
+
+        ' Réinitialiser tous les contrôles du formulaire avec les données du nouveau projet (vides)
+        DisplayCurrentProjectData()
+    End Sub
+
+    ' Méthode pour mettre à jour le titre du formulaire
+    Private Sub UpdateFormTitle()
+        Dim title As String = "Editeur Chorégraphique"
+        If Not String.IsNullOrEmpty(currentProjet.Titre) Then
+            title &= $" - {currentProjet.Titre}"
+        ElseIf Not String.IsNullOrEmpty(currentFilePath) Then
+            title &= $" - {Path.GetFileNameWithoutExtension(currentFilePath)}"
+        End If
+
+        If isDirty Then
+            title &= " *" ' Indique des modifications non enregistrées
+        End If
+        Me.Text = title
+    End Sub
+
+    ' Méthode à appeler chaque fois qu'une modification est faite sur les données du projet
+    Public Sub MarkAsDirty()
+        isDirty = True
+        UpdateFormTitle()
+    End Sub
+
+    ' Gérer la fermeture du formulaire pour demander d'enregistrer
+    Private Sub Form1_FormClosing(sender As Object, e As FormClosingEventArgs) Handles Me.FormClosing
+        If isDirty Then
+            Dim result As DialogResult = MessageBox.Show("Des modifications non enregistrées seront perdues. Voulez-vous enregistrer avant de quitter ?", "Enregistrer le projet", MessageBoxButtons.YesNoCancel, MessageBoxIcon.Warning)
+            If result = DialogResult.Yes Then
+                If Not SaveProject() Then
+                    e.Cancel = True ' Annule la fermeture si l'enregistrement échoue ou est annulé
+                End If
+            ElseIf result = DialogResult.Cancel Then
+                e.Cancel = True ' Annule la fermeture
+            End If
+        End If
+    End Sub
+
+    ' Méthode générique pour sauvegarder le projet
+    Private Function SaveProject(Optional saveAs As Boolean = False) As Boolean
+        ' Avant de sauvegarder, assure-toi que les données de l'UI sont dans l'objet currentProjet
+        UpdateCurrentProjectDataFromUI()
+
+        If String.IsNullOrEmpty(currentFilePath) OrElse saveAs Then
+            Using sfd As New SaveFileDialog()
+                sfd.Filter = "Fichiers Chorégraphie (*.chore)|*.chore|Tous les fichiers (*.*)|*.*"
+                sfd.Title = "Enregistrer le projet de chorégraphie"
+                sfd.DefaultExt = "chore"
+                sfd.FileName = If(Not String.IsNullOrEmpty(currentProjet.Titre), currentProjet.Titre, "NouveauProjet")
+
+                If sfd.ShowDialog() = DialogResult.OK Then
+                    currentFilePath = sfd.FileName
+                Else
+                    Return False ' L'utilisateur a annulé la boîte de dialogue
+                End If
+            End Using
+        End If
+
+        Try
+            Using writer As New StreamWriter(currentFilePath)
+                Dim serializer As New XmlSerializer(GetType(ProjetChoregraphique))
+                serializer.Serialize(writer, currentProjet)
+            End Using
+            isDirty = False
+            UpdateFormTitle()
+            MessageBox.Show("Projet enregistré avec succès !", "Enregistrement", MessageBoxButtons.OK, MessageBoxIcon.Information)
+            Return True
+        Catch ex As Exception
+            MessageBox.Show($"Erreur lors de l'enregistrement du projet : {ex.Message}", "Erreur", MessageBoxButtons.OK, MessageBoxIcon.Error)
+            Return False
+        End Try
+    End Function
+
+    ' Méthode pour charger un projet
+    Private Function LoadProject() As Boolean
+        Using ofd As New OpenFileDialog()
+            ofd.Filter = "Fichiers Chorégraphie (*.chore)|*.chore|Tous les fichiers (*.*)|*.*"
+            ofd.Title = "Ouvrir un projet de chorégraphie"
+            ofd.DefaultExt = "chore"
+
+            If ofd.ShowDialog() = DialogResult.OK Then
+                If isDirty Then
+                    Dim result As DialogResult = MessageBox.Show("Des modifications non enregistrées seront perdues. Voulez-vous enregistrer avant d'ouvrir un nouveau projet ?", "Enregistrer le projet", MessageBoxButtons.YesNoCancel, MessageBoxIcon.Warning)
+                    If result = DialogResult.Yes Then
+                        If Not SaveProject() Then
+                            Return False ' Annule l'ouverture si l'enregistrement échoue ou est annulé
+                        End If
+                    ElseIf result = DialogResult.Cancel Then
+                        Return False ' Annule l'ouverture
+                    End If
+                End If
+
+                Try
+                    Using reader As New StreamReader(ofd.FileName)
+                        Dim serializer As New XmlSerializer(GetType(ProjetChoregraphique))
+                        currentProjet = CType(serializer.Deserialize(reader), ProjetChoregraphique)
+                    End Using
+                    currentFilePath = ofd.FileName
+                    isDirty = False
+                    UpdateFormTitle()
+                    MessageBox.Show("Projet chargé avec succès !", "Ouverture", MessageBoxButtons.OK, MessageBoxIcon.Information)
+
+                    ' Mettre à jour tous les contrôles du formulaire avec les données du projet chargé
+                    DisplayCurrentProjectData()
+
+                    Return True
+                Catch ex As Exception
+                    MessageBox.Show($"Erreur lors du chargement du projet : {ex.Message}", "Erreur", MessageBoxButtons.OK, MessageBoxIcon.Error)
+                    Return False
+                End Try
+            Else
+                Return False ' L'utilisateur a annulé la boîte de dialogue
+            End If
+        End Using
+    End Function
+
+    ' --- Gestionnaires d'événements des boutons ---
+    Private Sub Bt_Save_Click(sender As Object, e As EventArgs) Handles Bt_Save.Click
+        SaveProject()
+    End Sub
+
+    Private Sub Bt_Save_As_Click(sender As Object, e As EventArgs) Handles Bt_Save_As.Click
+        SaveProject(saveAs:=True)
+    End Sub
+
+    Private Sub Bt_Open_Click(sender As Object, e As EventArgs) Handles Bt_Open.Click
+        LoadProject()
+    End Sub
+
+    Private Sub Bt_New_Click(sender As Object, e As EventArgs) Handles Bt_New.Click
+        If isDirty Then
+            Dim result As DialogResult = MessageBox.Show("Des modifications non enregistrées seront perdues. Voulez-vous enregistrer avant de créer un nouveau projet ?", "Nouveau Projet", MessageBoxButtons.YesNoCancel, MessageBoxIcon.Warning)
+            If result = DialogResult.Yes Then
+                If Not SaveProject() Then
+                    Return ' Annule le nouveau projet si l'enregistrement échoue ou est annulé
+                End If
+            ElseIf result = DialogResult.Cancel Then
+                Return ' Annule le nouveau projet
+            End If
+        End If
+        NewProject()
+    End Sub
+
+    ' ====================================================================================
+    ' MÉTHODES POUR GÉRER L'AFFICHAGE ET LA MISE À JOUR DES DONNÉES DE L'UI
+    ' ====================================================================================
+
+    ' Méthode pour afficher les données de currentProjet dans les contrôles de l'UI
+    Private Sub DisplayCurrentProjectData()
+        ' Section "Titre"
+        Title_Box.Text = currentProjet.Titre
+
+        ' Section "Intrigue"
+        Rich_Intrigue.Text = currentProjet.Intrigue
+
+        ' Section "Durée" (TextBox1 est le nom du contrôle pour la durée)
+        TextBox1.Text = currentProjet.Duree
+
+        ' Section "Combattants" (avec la nouvelle ListBox)
+        bsCombattantsDisplay.DataSource = currentProjet.ListeCombattants
+        bsCombattantsDisplay.ResetBindings(False) ' Rafraîchit l'affichage
+
+        ' Section "Assistants Plateau" (avec la nouvelle ListBox)
+        bsAssistantsDisplay.DataSource = currentProjet.ListeAssistants
+        bsAssistantsDisplay.ResetBindings(False) ' Rafraîchit l'affichage
+
+
+        ' Pour les boutons d'édition des combattants/assistants, ils n'affichent pas de données,
+        ' ils ouvriront des formulaires de gestion dédiés plus tard.
+    End Sub
+
+    ' Méthode pour prendre les données de l'UI et les mettre dans l'objet currentProjet
+    Private Sub UpdateCurrentProjectDataFromUI()
+        currentProjet.Titre = Title_Box.Text
+        currentProjet.Intrigue = Rich_Intrigue.Text
+        currentProjet.Duree = TextBox1.Text
+
+
+
+        ' Important : Pour les RichTextBox des combattants et assistants,
+        ' nous ne pouvons pas les "lire" facilement pour recréer la liste d'objets Combattant/Assistant.
+        ' Ces RichTextBox sont pour l'affichage uniquement dans cette version simplifiée.
+        ' La gestion réelle des listes de combattants/assistants se fera via les boutons "Editer..."
+        ' qui ouvriront de nouveaux formulaires dédiés à l'ajout/suppression/modification.
+        ' Pour l'instant, currentProjet.ListeCombattants et currentProjet.ListeAssistants
+        ' ne seront pas modifiés par la saisie directe dans ces RichTextBox.
+        ' C'est pourquoi j'avais suggéré des ListBox plus tôt, car elles sont faites pour ça.
+        ' On verra les dialogues d'édition plus tard.
+    End Sub
+
+    ' ====================================================================================
+    ' GESTION DES MODIFICATIONS DE L'UI POUR MARQUER LE PROJET COMME "Sale" (Dirty)
+    ' ====================================================================================
+
+    ' Marquer le projet comme modifié lorsque le titre change
+    Private Sub Title_Box_TextChanged(sender As Object, e As EventArgs) Handles Title_Box.TextChanged
+        MarkAsDirty()
+    End Sub
+
+    ' Marquer le projet comme modifié lorsque l'intrigue change
+    Private Sub Rich_Intrigue_TextChanged(sender As Object, e As EventArgs) Handles Rich_Intrigue.TextChanged
+        MarkAsDirty()
+    End Sub
+
+    ' Marquer le projet comme modifié lorsque la durée change
+    Private Sub TextBox1_TextChanged(sender As Object, e As EventArgs) Handles TextBox1.TextChanged
+        MarkAsDirty()
+    End Sub
+
+    ' TODO: Les RichTextBox pour Chorégraphe et Assistant n'ont pas de gestionnaire
+    ' MarkAsDirty car ils ne seront pas la source principale des données pour l'enregistrement.
+    ' Les données des listes de combattants et assistants seront gérées via des popups d'édition
+    ' qui, eux, appelleront MarkAsDirty.
+
+
+
+    Private Sub Bt_Edit_choregraphe_Click(sender As Object, e As EventArgs) Handles Bt_Edit_choregraphe.Click
+        ' Créer une instance du nouveau formulaire d'édition des combattants
+        Using formCombattants As New FormEditCombattants()
+            ' Passer la liste actuelle des combattants du projet au formulaire d'édition
+            formCombattants.ListeCombattantsDuProjet = currentProjet.ListeCombattants
+
+            ' Afficher le formulaire en tant que boîte de dialogue modale
+            Dim result As DialogResult = formCombattants.ShowDialog(Me) ' 'Me' définit Form1 comme propriétaire
+
+            ' Si l'utilisateur a cliqué sur "Valider et Fermer" (DialogResult.OK)
+            If result = DialogResult.OK Then
+                ' La liste ListeCombattantsDuProjet dans formCombattants a déjà été modifiée en direct.
+                ' Nous n'avons pas besoin de la réaffecter. Il suffit de rafraîchir l'affichage de Form1.
+                ' Et marquer le projet comme "sale" si des changements ont eu lieu.
+
+                ' La méthode DisplayCurrentProjectData rafraîchira le RichTextBox_Choregraphe
+                DisplayCurrentProjectData()
+                MarkAsDirty() ' Indique qu'il y a des modifications à sauvegarder
+            ElseIf result = DialogResult.Cancel Then
+                ' Si l'utilisateur a annulé, il faut restaurer la liste originale si elle a été modifiée en direct.
+                ' Dans cette implémentation simple, les modifications sont appliquées directement.
+                ' Pour un "vrai" annuler, il faudrait cloner la liste avant de la passer au dialogue
+                ' et ne la réaffecter que si DialogResult.OK.
+                ' Pour l'instant, on assume que "Annuler" signifie simplement ne pas marquer comme dirty
+                ' si aucune modification n'a été faite.
+                ' Puisque les modifications sont directes, la seule chose à faire est de ne PAS appeler MarkAsDirty() ici.
+                ' Cependant, si MarkAsDirtyInMainForm() a été appelée pendant l'édition, le Form1 est déjà marqué.
+                ' Ce n'est pas idéal mais fonctionne pour l'exemple. Une meilleure gestion serait un clone.
+            End If
+        End Using
+    End Sub
+
+    Private Sub Bt_Edit_assistant_Click(sender As Object, e As EventArgs) Handles Bt_Edit_assistant.Click
+        ' Créer une instance du nouveau formulaire d'édition des assistants
+        Using formAssistants As New FormEditAssistants()
+            ' Passer la liste actuelle des assistants du projet au formulaire d'édition
+            formAssistants.ListeAssistantsDuProjet = currentProjet.ListeAssistants
+
+            ' Afficher le formulaire en tant que boîte de dialogue modale
+            Dim result As DialogResult = formAssistants.ShowDialog(Me) ' 'Me' définit Form1 comme propriétaire
+
+            ' Si l'utilisateur a cliqué sur "Valider et Fermer" (DialogResult.OK)
+            If result = DialogResult.OK Then
+                ' La liste ListeAssistantsDuProjet dans formAssistants a déjà été modifiée en direct.
+                ' Nous n'avons pas besoin de la réaffecter. Il suffit de rafraîchir l'affichage de Form1.
+                DisplayCurrentProjectData()
+                MarkAsDirty() ' Indique qu'il y a des modifications à sauvegarder
+            ElseIf result = DialogResult.Cancel Then
+                ' Gérer l'annulation si nécessaire (voir les notes précédentes sur le clonage)
+            End If
+        End Using
+    End Sub
+
+    Private Sub Bt_Editer_Chore_Click(sender As Object, e As EventArgs) Handles Bt_Editer_Chore.Click
+
+        Using formPhraseDArmes As New FormEditPhraseDArmes()
+            ' Passe la liste des phrases d'armes du projet au formulaire d'édition
+            formPhraseDArmes.ListePhraseDArmesDuProjet = currentProjet.ChoregraphieSections
+
+            ' >>> AJOUTEZ CETTE LIGNE <<<
+            ' Passe l'objet ProjetChoregraphique complet au formulaire d'édition des phrases
+            formPhraseDArmes.CurrentProjet = currentProjet
+
+            ' Affiche le formulaire en tant que boîte de dialogue modale
+            Dim result As DialogResult = formPhraseDArmes.ShowDialog(Me) ' 'Me' définit Form1 comme propriétaire
+
+            ' Si l'utilisateur a cliqué sur "Valider et Fermer" (DialogResult.OK)
+            If result = DialogResult.OK Then
+                ' La liste ListePhraseDArmesDuProjet dans formPhraseDArmes a déjà été modifiée en direct.
+                ' Il suffit de rafraîchir l'affichage de Form1.
+                DisplayCurrentProjectData()
+                MarkAsDirty() ' Indique qu'il y a des modifications à sauvegarder
+            ElseIf result = DialogResult.Cancel Then
+                ' L'utilisateur a annulé, aucune action particulière à faire car la liste n'a pas été modifiée.
+            End If
+        End Using
+    End Sub
+
+
+
+
+    ' Assure-toi que tu as accès à l'objet Projet global ici.
+    ' Je suppose que tu as une propriété ou une variable de champ pour ton projet actuel.
+
+    Private Sub btnGeneratePdf_Click(sender As Object, e As EventArgs) Handles btnGeneratePdf.Click
+        If currentProjet Is Nothing Then
+            MessageBox.Show("Aucun projet n'est chargé à éditer.", "Erreur", MessageBoxButtons.OK, MessageBoxIcon.Warning)
+            Return
+        End If
+
+        ' Définir le chemin de sauvegarde du PDF
+        Dim saveFileDialog As New SaveFileDialog()
+        saveFileDialog.Filter = "Fichiers PDF (*.pdf)|*.pdf"
+        saveFileDialog.Title = "Enregistrer le rapport PDF"
+        saveFileDialog.FileName = $"Rapport_{currentProjet.Titre.Replace(" ", "_")}.pdf" ' Nom de fichier par défaut
+
+        If saveFileDialog.ShowDialog() = DialogResult.OK Then
+            Dim filePath As String = saveFileDialog.FileName
+
+            Try
+                ' 1. Créer un nouveau document PDF
+                ' Document(left, right, top, bottom) margins
+                Dim doc As New Document(PageSize.A3.Rotate(), 30, 30, 30, 30)
+
+                ' 2. Créer un PdfWriter pour écrire le document dans un fichier
+                PdfWriter.GetInstance(doc, New FileStream(filePath, FileMode.Create))
+
+                ' 3. Ouvrir le document pour y ajouter du contenu
+                doc.Open()
+
+                ' --- Styles (Polices) ---
+                Dim fontTitle As Font = FontFactory.GetFont(FontFactory.HELVETICA_BOLD, 24, BaseColor.BLACK)
+                Dim fontSubtitle As Font = FontFactory.GetFont(FontFactory.HELVETICA_BOLD, 16, BaseColor.DARK_GRAY)
+                Dim fontNormal As Font = FontFactory.GetFont(FontFactory.HELVETICA, 12, BaseColor.BLACK)
+                Dim fontSmall As Font = FontFactory.GetFont(FontFactory.HELVETICA, 10, BaseColor.GRAY)
+                Dim fontTiny As Font = FontFactory.GetFont(FontFactory.HELVETICA, 8, BaseColor.BLACK) ' Police pour les données de tableau
+
+                ' --- Ajouter le titre et l'intrigue ---
+                doc.Add(New Paragraph("Titre : " & currentProjet.Titre, fontTitle))
+                doc.Add(New Paragraph("Intrigue : " & currentProjet.Intrigue, fontSubtitle))
+                doc.Add(New Paragraph(Environment.NewLine)) ' Ligne vide
+
+                ' --- Tableau Combattants / Assistants ---
+                doc.Add(New Paragraph("Participants :", fontSubtitle))
+                Dim tableParticipants As New PdfPTable(2) ' 2 colonnes
+                tableParticipants.WidthPercentage = 100 ' Prend 100% de la largeur disponible
+                tableParticipants.SetWidths(New Single() {1, 1}) ' Largeur relative des colonnes
+
+                ' En-têtes du tableau
+                tableParticipants.AddCell(New PdfPCell(New Phrase("Combattant", fontNormal)))
+                tableParticipants.AddCell(New PdfPCell(New Phrase("Assistant", fontNormal)))
+
+                ' Contenu du tableau
+                Dim maxParticipants As Integer = Math.Max(currentProjet.ListeCombattants.Count, currentProjet.ListeAssistants.Count)
+                If maxParticipants = 0 Then maxParticipants = 1 ' Au moins une ligne pour afficher vide
+
+                For i As Integer = 0 To maxParticipants - 1
+                    Dim combattantCell As New PdfPCell()
+                    If i < currentProjet.ListeCombattants.Count Then
+                        Dim c As Combattant = currentProjet.ListeCombattants(i)
+                        combattantCell.AddElement(New Phrase($"{c.Nom} {c.Prenom} (ID: {c.ID}) (Licence: {c.NumeroLicence} )", fontNormal)) ' Garder fontNormal ici, c'est bien pour les noms
+                    Else
+                        combattantCell.AddElement(New Phrase("")) ' Cellule vide si pas de combattant
+                    End If
+                    tableParticipants.AddCell(combattantCell)
+
+                    Dim assistantCell As New PdfPCell()
+                    If i < currentProjet.ListeAssistants.Count Then
+                        Dim a As Assistant = currentProjet.ListeAssistants(i)
+                        assistantCell.AddElement(New Phrase($"{a.Nom} {a.Prenom} (Licence: {a.NumeroLicence})", fontNormal)) ' Garder fontNormal ici
+                    Else
+                        assistantCell.AddElement(New Phrase("")) ' Cellule vide si pas d'assistant
+                    End If
+                    tableParticipants.AddCell(assistantCell)
+                Next
+                doc.Add(tableParticipants)
+                doc.Add(New Paragraph(Environment.NewLine)) ' Ligne vide
+
+                ' --- Phrases d'armes et leurs actions ---
+                For Each phrase As PhraseDArmes In currentProjet.ChoregraphieSections.OrderBy(Function(p) p.Numero) ' S'assurer de l'ordre
+                    doc.Add(New Paragraph($"Phrase {phrase.Numero} : {phrase.DescriptionSection}", fontSubtitle)) ' Changé à fontSubtitle pour que la description de la phrase soit plus visible
+                    doc.Add(New Paragraph(Environment.NewLine))
+
+                    ' Tableau des Actions pour chaque phrase
+                    ' Déterminer le nombre de colonnes nécessaires pour le tableau d'actions
+                    Dim numColsPerCombatant As Integer = 7 ' MainD, ZoneMD, CibleMD, MainG, ZoneMG, CibleMG, Déplacement, Commentaire
+                    Dim totalColumns As Integer = 1 ' NumeroAction
+                    If currentProjet.ListeCombattants.Count > 0 Then
+                        totalColumns += currentProjet.ListeCombattants.Count * numColsPerCombatant
+                        ' Ajustement pour les colonnes Cible si showTargetColumns est false (car on ne les affiche pas pour <= 2 combattants)
+                        If currentProjet.ListeCombattants.Count <= 2 Then
+                            totalColumns -= currentProjet.ListeCombattants.Count * 2 ' 2 colonnes cible en moins par combattant
+                        End If
+                    End If
+
+                    ' S'assurer d'avoir au moins la colonne numéro d'action si pas de combattants
+                    If totalColumns = 0 Then totalColumns = 1
+
+                    Dim tableActions As New PdfPTable(totalColumns)
+                    tableActions.WidthPercentage = 100
+
+                    ' En-têtes du tableau dgvActions
+                    tableActions.AddCell(New PdfPCell(New Phrase("N°", fontTiny))) ' Numéro d'action (utiliser fontTiny)
+
+                    ' Création des en-têtes dynamiques comme dans BuildActionsDataTable
+                    Dim showTargetColumnsGrid As Boolean = currentProjet.ListeCombattants.Count > 2
+
+                    For Each combatant As Combattant In currentProjet.ListeCombattants
+                        tableActions.AddCell(New PdfPCell(New Phrase($"Main D ({combatant.ID})", fontTiny)))
+                        tableActions.AddCell(New PdfPCell(New Phrase($"Zone MD ({combatant.ID})", fontTiny)))
+                        If showTargetColumnsGrid Then tableActions.AddCell(New PdfPCell(New Phrase($"Cible MD ({combatant.ID})", fontTiny)))
+                        tableActions.AddCell(New PdfPCell(New Phrase($"Main G ({combatant.ID})", fontTiny)))
+                        tableActions.AddCell(New PdfPCell(New Phrase($"Zone MG ({combatant.ID})", fontTiny)))
+                        If showTargetColumnsGrid Then tableActions.AddCell(New PdfPCell(New Phrase($"Cible MG ({combatant.ID})", fontTiny)))
+                        tableActions.AddCell(New PdfPCell(New Phrase($"Dépl. ({combatant.ID})", fontTiny)))
+                        tableActions.AddCell(New PdfPCell(New Phrase($"Com. ({combatant.ID})", fontTiny)))
+                    Next
+
+                    ' Remplir les lignes du tableau d'actions
+                    For Each action As Action In phrase.ListeActions.OrderBy(Function(a) a.NumeroAction) ' Ordre des actions
+                        tableActions.AddCell(New PdfPCell(New Phrase(CStr(action.NumeroAction), fontTiny)))
+
+                        For Each projectCombatant As Combattant In currentProjet.ListeCombattants
+                            Dim mouvementForCombatant As Mouvement = action.Mouvements.FirstOrDefault(Function(m) m.CombattantID = projectCombatant.ID)
+
+                            If mouvementForCombatant IsNot Nothing Then
+                                tableActions.AddCell(New PdfPCell(New Phrase(mouvementForCombatant.MainDroite, fontTiny)))
+                                tableActions.AddCell(New PdfPCell(New Phrase(mouvementForCombatant.ZoneMainDroite, fontTiny)))
+                                If showTargetColumnsGrid Then
+                                    ' *** MODIFICATION ICI : Convertir 0 en chaîne vide pour CibleMainDroiteID ***
+                                    Dim cibleMDText As String = If(mouvementForCombatant.CibleMainDroiteID = 0, "", CStr(mouvementForCombatant.CibleMainDroiteID))
+                                    tableActions.AddCell(New PdfPCell(New Phrase(cibleMDText, fontTiny)))
+                                End If
+                                tableActions.AddCell(New PdfPCell(New Phrase(mouvementForCombatant.MainGauche, fontTiny)))
+                                tableActions.AddCell(New PdfPCell(New Phrase(mouvementForCombatant.ZoneMainGauche, fontTiny)))
+                                If showTargetColumnsGrid Then
+                                    ' *** MODIFICATION ICI : Convertir 0 en chaîne vide pour CibleMainGaucheID ***
+                                    Dim cibleMGText As String = If(mouvementForCombatant.CibleMainGaucheID = 0, "", CStr(mouvementForCombatant.CibleMainGaucheID))
+                                    tableActions.AddCell(New PdfPCell(New Phrase(cibleMGText, fontTiny)))
+                                End If
+                                tableActions.AddCell(New PdfPCell(New Phrase(mouvementForCombatant.Deplacement, fontTiny)))
+                                tableActions.AddCell(New PdfPCell(New Phrase($"{mouvementForCombatant.Commentaire} {mouvementForCombatant.PouvoirForce}".Trim(), fontTiny)))
+                            Else
+                                ' Cellules vides pour les mouvements non trouvés (utiliser fontTiny pour la cohérence)
+                                tableActions.AddCell(New PdfPCell(New Phrase("", fontTiny))) ' <-- Changé de fontSmall à fontTiny
+                                tableActions.AddCell(New PdfPCell(New Phrase("", fontTiny))) ' <-- Changé de fontSmall à fontTiny
+                                If showTargetColumnsGrid Then tableActions.AddCell(New PdfPCell(New Phrase("", fontTiny))) ' <-- Changé de fontSmall à fontTiny
+                                tableActions.AddCell(New PdfPCell(New Phrase("", fontTiny))) ' <-- Changé de fontSmall à fontTiny
+                                tableActions.AddCell(New PdfPCell(New Phrase("", fontTiny))) ' <-- Changé de fontSmall à fontTiny
+                                If showTargetColumnsGrid Then tableActions.AddCell(New PdfPCell(New Phrase("", fontTiny))) ' <-- Changé de fontSmall à fontTiny
+                                tableActions.AddCell(New PdfPCell(New Phrase("", fontTiny))) ' <-- Changé de fontSmall à fontTiny
+                                tableActions.AddCell(New PdfPCell(New Phrase("", fontTiny))) ' <-- Changé de fontSmall à fontTiny
+                            End If
+                        Next
+                    Next
+                    doc.Add(tableActions)
+                    doc.Add(New Paragraph(Environment.NewLine)) ' Ligne vide après chaque tableau d'actions
+                Next
+
+                ' 4. Fermer le document
+                doc.Close()
+
+                MessageBox.Show($"Le rapport PDF a été généré avec succès à l'emplacement : {filePath}", "PDF Généré", MessageBoxButtons.OK, MessageBoxIcon.Information)
+
+            Catch ex As Exception
+                MessageBox.Show($"Une erreur est survenue lors de la génération du PDF : {ex.Message}", "Erreur PDF", MessageBoxButtons.OK, MessageBoxIcon.Error)
+            End Try
+        End If
+    End Sub
+
+End Class
+
+
+
+
