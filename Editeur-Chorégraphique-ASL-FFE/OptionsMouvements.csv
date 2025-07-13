@@ -3,67 +3,70 @@
 Amputer;Appel;Zone 1
 Attaque;Balestra;Zone 2
 Attaque du Faucon (l');Bond arrière;Zone 3
-Balayage (le);Bond avant;Zone 4
-Coulé;Contre Volte arrière;Zone 5
-Couper en biais ou horizontalement le torse;Contre Volte avant;Zone 6
-Couronné;Déplacement en croisant arrière;
-Décapitation;Déplacement en croisant arrière;
-Désarmer;Déplacement en croisant de face;
-Détruire l’arme;Déplacement en croisant de face;
-Développement;Esquive arrière;
-Écharpe d'honneur (l');Esquive latérale;
-Écharpe d'honneur (l');Fente;
-Éclipse d’orbite;Feuille morte;
-Enchaînement offensif de rotations frontales;Glissement arrière;
-Enchaînement offensif de rotations horizontales;Glissement avant;
-Enchaînement offensif de rotations sagittales;Grand recul;
-Estoc;Grande avancée;
-Feinte;Grande avancée marquée;
-Feuille morte;Pas chassé;
-Flèche;Pas croisé arrière;
-Frapper les tempes;Pas croisé avant;
-Froissement;Retrait sur la jambe arrière;
-Halo ou 3e orbite à droite / à gauche;Saut du Croissant de lune;
-Lever le rideau;Saut en Pleine Lune;
-Orbite;Volte arrière;
-Orbite ascendante;Volte avant;
-Orbite descendante;Volte;
-Orbite horizontale;Butterfly;
-Orbite majeure;Esquive partielle de la jambe;
-Orbite mineure;Inquartata;
-Orbite seule;Demi fente;
-Prise de lame;Volte sautée arrière;
-Attaque latérale;Esquive partielle vers le bas;
-Coup de pied;Esquive partielle vers l'arrière;
-Coup de poing;Esquive sautée;
-Coup de tête;Glissade avant;
-Revers du poing;Double inquartata;
-Éruption solaire;Esquive;
-Écraser de lame;Roulade;
-Coup de pommeau;Inquartata;
-Brisé;Roue;
-Coup de pied latéral;Bond en croissant de lune;
-Coup de genou;;
+Attaque latérale;Bond avant;Zone 4
+Balayage (le);Bond en croissant de lune;Zone 5
+Blocage avec la main;Butterfly;Zone 6
+Brisé;Contre Volte arrière;Zone 1-2
+Chasse (la);Contre Volte avant;Zone 1-3
+Coulé;Demi fente;Zone 2-6
+Coup de genou;Déplacement en croisant arrière;Zone 3-5
+Coup de pied;Déplacement en croisant arrière;
+Coup de pied latéral;Déplacement en croisant de face;
+Coup de poing;Déplacement en croisant de face;
+Coup de pommeau;Double inquartata;
+Coup de tête;Esquive;
+Couper en biais ou horizontalement le torse;Esquive arrière;
+Couronné;Esquive latérale;
+Danse de lame (la);Esquive partielle de la jambe;
+Décapitation;Esquive partielle vers l'arrière;
+Désarmer;Esquive partielle vers le bas;
+Détruire l’arme;Esquive sautée;
+Développement;Fente;
+Écharpe d'honneur (l');Feuille morte;
+Écharpe d'honneur (l');Glissade avant;
+Éclipse d’orbite;Glissement arrière;
+Écraser de lame;Glissement avant;
+Enchaînement offensif de rotations frontales;Grand recul;
+Enchaînement offensif de rotations horizontales;Grande avancée;
+Enchaînement offensif de rotations sagittales;Grande avancée marquée;
+Enroulement;Inquartata;
+Envelopper la lame;Inquartata;
+Éruption solaire;Pas chassé;
+Éruption solaire (l');Pas croisé arrière;
+Esquive;Pas croisé avant;
+Estoc;Retrait sur la jambe arrière;
+Feinte;Roue;
+Feinte;Roulade;
+Feinte;Saut du Croissant de lune;
+Feuille morte;Saut en Pleine Lune;
+Flèche;Volte;
+Frapper les tempes;Volte arrière;
+Froissement;Volte avant;
+Froissement;Volte sautée arrière;
+Froissement;;
 Halo;;
-Chasse (la);;
-Danse de lame (la);;
-Éruption solaire (l');;
-Feinte;;
-Feinte;;
-Froissement;;
-Froissement;;
+Halo ou 3e orbite à droite / à gauche;;
+Lever le rideau;;
 Nuée de Lames;;
 Nuée de Lames;;
+Orbite;;
+Orbite ascendante;;
+Orbite descendante;;
+Orbite horizontale;;
+Orbite majeure;;
+Orbite mineure;;
+Orbite seule;;
 Parade;;
-Parade Nadir;;
+Parade;;
 Parade  Zenith;;
-Parade inversée;;
-Prise de lame;;
-Parade verticale;;
-Parade horizontale;;
-Envelopper la lame;;
-Passage sous la lame;;
-Blocage avec la main;;
 Parade du bras;;
 Parade en croix;;
-Parade;;
+Parade horizontale;;
+Parade inversée;;
+Parade Nadir;;
+Parade verticale;;
+Passage sous la lame;;
+Prise de lame;;
+Prise de lame;;
+Revers du poing;;
+Trancher;;

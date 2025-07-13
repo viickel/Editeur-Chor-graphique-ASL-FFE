@@ -349,25 +349,53 @@ Public Class Form1
             Return
         End If
 
+        ' Assurez-vous que la ComboBox existe et a des éléments sélectionnés
+        If cboPageSize.SelectedItem Is Nothing Then
+            MessageBox.Show("Veuillez sélectionner un format de page (A4/A3, Portrait/Paysage).", "Format de page manquant", MessageBoxButtons.OK, MessageBoxIcon.Warning)
+            Return
+        End If
+
         ' Définir le chemin de sauvegarde du PDF
         Dim saveFileDialog As New SaveFileDialog()
         saveFileDialog.Filter = "Fichiers PDF (*.pdf)|*.pdf"
-        saveFileDialog.Title = "Enregistrer le rapport PDF"
-        saveFileDialog.FileName = $"Rapport_{currentProjet.Titre.Replace(" ", "_")}.pdf" ' Nom de fichier par défaut
+        saveFileDialog.Title = "Enregistrer le Projet PDF"
+        saveFileDialog.FileName = $"Projet Chorégraphique_{currentProjet.Titre.Replace(" ", "_")}.pdf" ' Nom de fichier par défaut
 
         If saveFileDialog.ShowDialog() = DialogResult.OK Then
             Dim filePath As String = saveFileDialog.FileName
 
             Try
+                ' *** DÉBUT DES NOUVELLES MODIFICATIONS ***
+
+                ' Récupérer la taille de page et l'orientation choisie par l'utilisateur
+                Dim pageSize As iTextSharp.text.Rectangle
+                Dim selectedPageSize As String = cboPageSize.SelectedItem.ToString() ' Récupère le texte sélectionné
+
+                Select Case selectedPageSize
+                    Case "A4 Portrait"
+                        pageSize = iTextSharp.text.PageSize.A4
+                    Case "A4 Paysage"
+                        pageSize = iTextSharp.text.PageSize.A4.Rotate()
+                    Case "A3 Portrait"
+                        pageSize = iTextSharp.text.PageSize.A3
+                    Case "A3 Paysage"
+                        pageSize = iTextSharp.text.PageSize.A3.Rotate()
+                    Case Else ' Fallback par sécurité, si rien n'est sélectionné ou valeur inattendue
+                        pageSize = iTextSharp.text.PageSize.A4.Rotate() ' Défaut à A4 Paysage
+                        MessageBox.Show("Format de page inconnu sélectionné, utilisant A4 Paysage par défaut.", "Avertissement", MessageBoxButtons.OK, MessageBoxIcon.Warning)
+                End Select
+
                 ' 1. Créer un nouveau document PDF
-                ' Document(left, right, top, bottom) margins
-                ' Augmentation de la marge inférieure pour le numéro de page
-                Dim doc As New Document(PageSize.A3.Rotate(), 30, 30, 30, 50) ' Marge du bas à 50 pour laisser de la place
+                ' Document(taille_de_page_choisie, left, right, top, bottom) margins
+                ' La marge du bas à 50 est bonne pour laisser de la place au numéro de page
+                Dim doc As New Document(pageSize, 30, 30, 30, 50)
+
+                ' *** FIN DES NOUVELLES MODIFICATIONS ***
 
                 ' 2. Créer un PdfWriter pour écrire le document dans un fichier
                 Dim writer As PdfWriter = PdfWriter.GetInstance(doc, New FileStream(filePath, FileMode.Create))
 
-                ' *** AJOUT : Enregistrer l'événement de page pour la numérotation ***
+                ' Enregistrer l'événement de page pour la numérotation
                 Dim pageEvent As New PageNumberEventHelper()
                 writer.PageEvent = pageEvent
 
@@ -385,17 +413,16 @@ Public Class Form1
                 doc.Add(New Paragraph("Titre : " & currentProjet.Titre, fontTitle))
                 doc.Add(New Paragraph("Intrigue : " & currentProjet.Intrigue, fontSubtitle))
 
-                ' *** AJOUT : Affichage du temps ***
-                ' Assurez-vous que currentProjet.Temps existe et est formaté correctement.
-                ' Si currentProjet.Temps est un TimeSpan:
+                ' *** DÉBUT DE LA CORRECTION POUR LA DURÉE (STRING) ***
                 Dim tempsFormatted As String = ""
-                If currentProjet.Duree IsNot Nothing Then
+                If Not String.IsNullOrEmpty(currentProjet.Duree) Then
                     tempsFormatted = $"Durée : {currentProjet.Duree}"
                 Else
                     tempsFormatted = "Durée : Non spécifiée."
                 End If
-                doc.Add(New Paragraph(tempsFormatted, fontSubtitle)) ' Utilisation de fontNormal pour le temps
+                doc.Add(New Paragraph(tempsFormatted, fontSubtitle)) ' Vous avez changé fontNormal en fontSubtitle ici, je le garde comme vous l'avez fait.
                 doc.Add(New Paragraph(Environment.NewLine)) ' Ligne vide après le temps
+                ' *** FIN DE LA CORRECTION POUR LA DURÉE (STRING) ***
 
                 ' --- Tableau Combattants / Assistants ---
                 doc.Add(New Paragraph("Participants :", fontSubtitle))
@@ -403,7 +430,7 @@ Public Class Form1
                 tableParticipants.WidthPercentage = 100 ' Prend 100% de la largeur disponible
                 tableParticipants.SetWidths(New Single() {1, 1}) ' Largeur relative des colonnes
 
-                doc.Add(New Paragraph(Environment.NewLine)) ' Ligne vide
+                doc.Add(New Paragraph(Environment.NewLine)) ' Ligne vide - (Note: cette ligne vide avant les en-têtes du tableau pourrait être déplacée après tableParticipants.AddCell(tableParticipants))
 
                 ' En-têtes du tableau
                 tableParticipants.AddCell(New PdfPCell(New Phrase("Combattant", fontNormal)))

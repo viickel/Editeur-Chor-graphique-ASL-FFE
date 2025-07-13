@@ -41,10 +41,13 @@ Partial Class Form1
         Label2 = New Label()
         Bt_New = New Button()
         btnGeneratePdf = New Button()
+        cboPageSize = New ComboBox()
+        GroupBox1 = New GroupBox()
         CType(SplitContainer1, ComponentModel.ISupportInitialize).BeginInit()
         SplitContainer1.Panel1.SuspendLayout()
         SplitContainer1.Panel2.SuspendLayout()
         SplitContainer1.SuspendLayout()
+        GroupBox1.SuspendLayout()
         SuspendLayout()
         ' 
         ' Bt_Open
@@ -221,19 +224,40 @@ Partial Class Form1
         ' 
         ' btnGeneratePdf
         ' 
-        btnGeneratePdf.Location = New Point(474, 28)
+        btnGeneratePdf.Location = New Point(163, 22)
         btnGeneratePdf.Name = "btnGeneratePdf"
         btnGeneratePdf.Size = New Size(146, 29)
         btnGeneratePdf.TabIndex = 18
         btnGeneratePdf.Text = "Générer PDF"
         btnGeneratePdf.UseVisualStyleBackColor = True
         ' 
+        ' cboPageSize
+        ' 
+        cboPageSize.DropDownStyle = ComboBoxStyle.DropDownList
+        cboPageSize.FormattingEnabled = True
+        cboPageSize.Items.AddRange(New Object() {"A4 Paysage", "A4 Portrait", "A3 Paysage", "A3 Portrait"})
+        cboPageSize.Location = New Point(6, 22)
+        cboPageSize.Name = "cboPageSize"
+        cboPageSize.Size = New Size(151, 28)
+        cboPageSize.TabIndex = 19
+        ' 
+        ' GroupBox1
+        ' 
+        GroupBox1.Controls.Add(btnGeneratePdf)
+        GroupBox1.Controls.Add(cboPageSize)
+        GroupBox1.Location = New Point(469, 8)
+        GroupBox1.Name = "GroupBox1"
+        GroupBox1.Size = New Size(319, 57)
+        GroupBox1.TabIndex = 20
+        GroupBox1.TabStop = False
+        GroupBox1.Text = "Génération PDF"
+        ' 
         ' Form1
         ' 
         AutoScaleDimensions = New SizeF(8F, 20F)
         AutoScaleMode = AutoScaleMode.Font
         ClientSize = New Size(800, 524)
-        Controls.Add(btnGeneratePdf)
+        Controls.Add(GroupBox1)
         Controls.Add(Bt_New)
         Controls.Add(Label2)
         Controls.Add(TextBox1)
@@ -254,6 +278,7 @@ Partial Class Form1
         SplitContainer1.Panel2.PerformLayout()
         CType(SplitContainer1, ComponentModel.ISupportInitialize).EndInit()
         SplitContainer1.ResumeLayout(False)
+        GroupBox1.ResumeLayout(False)
         ResumeLayout(False)
         PerformLayout()
     End Sub
@@ -280,5 +305,7 @@ Partial Class Form1
     Friend WithEvents lstAssistantsDisplay As ListBox
     Friend WithEvents lstCombattants As ListBox
     Friend WithEvents btnGeneratePdf As Button
+    Friend WithEvents cboPageSize As ComboBox
+    Friend WithEvents GroupBox1 As GroupBox
 
 End Class
