@@ -361,10 +361,15 @@ Public Class Form1
             Try
                 ' 1. Créer un nouveau document PDF
                 ' Document(left, right, top, bottom) margins
-                Dim doc As New Document(PageSize.A3.Rotate(), 30, 30, 30, 30)
+                ' Augmentation de la marge inférieure pour le numéro de page
+                Dim doc As New Document(PageSize.A3.Rotate(), 30, 30, 30, 50) ' Marge du bas à 50 pour laisser de la place
 
                 ' 2. Créer un PdfWriter pour écrire le document dans un fichier
-                PdfWriter.GetInstance(doc, New FileStream(filePath, FileMode.Create))
+                Dim writer As PdfWriter = PdfWriter.GetInstance(doc, New FileStream(filePath, FileMode.Create))
+
+                ' *** AJOUT : Enregistrer l'événement de page pour la numérotation ***
+                Dim pageEvent As New PageNumberEventHelper()
+                writer.PageEvent = pageEvent
 
                 ' 3. Ouvrir le document pour y ajouter du contenu
                 doc.Open()
@@ -376,16 +381,29 @@ Public Class Form1
                 Dim fontSmall As Font = FontFactory.GetFont(FontFactory.HELVETICA, 10, BaseColor.GRAY)
                 Dim fontTiny As Font = FontFactory.GetFont(FontFactory.HELVETICA, 8, BaseColor.BLACK) ' Police pour les données de tableau
 
-                ' --- Ajouter le titre et l'intrigue ---
+                ' --- Ajouter le titre, l'intrigue et le temps ---
                 doc.Add(New Paragraph("Titre : " & currentProjet.Titre, fontTitle))
                 doc.Add(New Paragraph("Intrigue : " & currentProjet.Intrigue, fontSubtitle))
-                doc.Add(New Paragraph(Environment.NewLine)) ' Ligne vide
+
+                ' *** AJOUT : Affichage du temps ***
+                ' Assurez-vous que currentProjet.Temps existe et est formaté correctement.
+                ' Si currentProjet.Temps est un TimeSpan:
+                Dim tempsFormatted As String = ""
+                If currentProjet.Duree IsNot Nothing Then
+                    tempsFormatted = $"Durée : {currentProjet.Duree}"
+                Else
+                    tempsFormatted = "Durée : Non spécifiée."
+                End If
+                doc.Add(New Paragraph(tempsFormatted, fontSubtitle)) ' Utilisation de fontNormal pour le temps
+                doc.Add(New Paragraph(Environment.NewLine)) ' Ligne vide après le temps
 
                 ' --- Tableau Combattants / Assistants ---
                 doc.Add(New Paragraph("Participants :", fontSubtitle))
                 Dim tableParticipants As New PdfPTable(2) ' 2 colonnes
                 tableParticipants.WidthPercentage = 100 ' Prend 100% de la largeur disponible
                 tableParticipants.SetWidths(New Single() {1, 1}) ' Largeur relative des colonnes
+
+                doc.Add(New Paragraph(Environment.NewLine)) ' Ligne vide
 
                 ' En-têtes du tableau
                 tableParticipants.AddCell(New PdfPCell(New Phrase("Combattant", fontNormal)))
@@ -399,7 +417,7 @@ Public Class Form1
                     Dim combattantCell As New PdfPCell()
                     If i < currentProjet.ListeCombattants.Count Then
                         Dim c As Combattant = currentProjet.ListeCombattants(i)
-                        combattantCell.AddElement(New Phrase($"{c.Nom} {c.Prenom} (ID: {c.ID}) (Licence: {c.NumeroLicence} )", fontNormal)) ' Garder fontNormal ici, c'est bien pour les noms
+                        combattantCell.AddElement(New Phrase($"{c.Nom} {c.Prenom} (ID: {c.ID}) (Licence: {c.NumeroLicence})", fontNormal))
                     Else
                         combattantCell.AddElement(New Phrase("")) ' Cellule vide si pas de combattant
                     End If
@@ -408,7 +426,7 @@ Public Class Form1
                     Dim assistantCell As New PdfPCell()
                     If i < currentProjet.ListeAssistants.Count Then
                         Dim a As Assistant = currentProjet.ListeAssistants(i)
-                        assistantCell.AddElement(New Phrase($"{a.Nom} {a.Prenom} (Licence: {a.NumeroLicence})", fontNormal)) ' Garder fontNormal ici
+                        assistantCell.AddElement(New Phrase($"{a.Nom} {a.Prenom} (Licence: {a.NumeroLicence})", fontNormal))
                     Else
                         assistantCell.AddElement(New Phrase("")) ' Cellule vide si pas d'assistant
                     End If
@@ -416,85 +434,116 @@ Public Class Form1
                 Next
                 doc.Add(tableParticipants)
                 doc.Add(New Paragraph(Environment.NewLine)) ' Ligne vide
+                doc.NewPage() ' Nouvelle page après le tableau des participants
 
-                ' --- Phrases d'armes et leurs actions ---
+                ' --- Phrases d'armes et leurs actions (Structure de tableau inversée) ---
+                Dim firstPhrase As Boolean = True
                 For Each phrase As PhraseDArmes In currentProjet.ChoregraphieSections.OrderBy(Function(p) p.Numero) ' S'assurer de l'ordre
-                    doc.Add(New Paragraph($"Phrase {phrase.Numero} : {phrase.DescriptionSection}", fontSubtitle)) ' Changé à fontSubtitle pour que la description de la phrase soit plus visible
-                    doc.Add(New Paragraph(Environment.NewLine))
-
-                    ' Tableau des Actions pour chaque phrase
-                    ' Déterminer le nombre de colonnes nécessaires pour le tableau d'actions
-                    Dim numColsPerCombatant As Integer = 7 ' MainD, ZoneMD, CibleMD, MainG, ZoneMG, CibleMG, Déplacement, Commentaire
-                    Dim totalColumns As Integer = 1 ' NumeroAction
-                    If currentProjet.ListeCombattants.Count > 0 Then
-                        totalColumns += currentProjet.ListeCombattants.Count * numColsPerCombatant
-                        ' Ajustement pour les colonnes Cible si showTargetColumns est false (car on ne les affiche pas pour <= 2 combattants)
-                        If currentProjet.ListeCombattants.Count <= 2 Then
-                            totalColumns -= currentProjet.ListeCombattants.Count * 2 ' 2 colonnes cible en moins par combattant
-                        End If
+                    ' *** AJOUT : Saut de page pour chaque nouvelle phrase d'armes (sauf la toute première) ***
+                    If Not firstPhrase Then
+                        doc.NewPage()
+                    Else
+                        firstPhrase = False
                     End If
 
-                    ' S'assurer d'avoir au moins la colonne numéro d'action si pas de combattants
-                    If totalColumns = 0 Then totalColumns = 1
+                    ' Ajouter le titre de la phrase
+                    doc.Add(New Paragraph($"Phrase {phrase.Numero} : {phrase.DescriptionSection}", fontSubtitle))
+                    doc.Add(New Paragraph(Environment.NewLine))
 
-                    Dim tableActions As New PdfPTable(totalColumns)
-                    tableActions.WidthPercentage = 100
+                    ' Déterminer le nombre d'actions dans cette phrase
+                    Dim numActions As Integer = phrase.ListeActions.Count
+                    If numActions = 0 Then
+                        doc.Add(New Paragraph("Aucune action définie pour cette phrase.", fontSmall))
+                        doc.Add(New Paragraph(Environment.NewLine))
+                        Continue For ' Passer à la phrase suivante
+                    End If
 
-                    ' En-têtes du tableau dgvActions
-                    tableActions.AddCell(New PdfPCell(New Phrase("N°", fontTiny))) ' Numéro d'action (utiliser fontTiny)
+                    ' Le nombre de colonnes du tableau sera (1 fixe pour l'entête) + (nombre d'actions)
+                    Dim totalColumnsTableActions As Integer = 1 + numActions
+                    Dim tableActionsInverted As New PdfPTable(totalColumnsTableActions)
+                    tableActionsInverted.WidthPercentage = 100
 
-                    ' Création des en-têtes dynamiques comme dans BuildActionsDataTable
-                    Dim showTargetColumnsGrid As Boolean = currentProjet.ListeCombattants.Count > 2
+                    ' Définir les largeurs des colonnes (vous devrez ajuster ces valeurs)
+                    Dim widths As New List(Of Single)()
+                    widths.Add(2.0F) ' Largeur plus grande pour la colonne d'entête (ex: "Main D", "Zone MD")
 
-                    For Each combatant As Combattant In currentProjet.ListeCombattants
-                        tableActions.AddCell(New PdfPCell(New Phrase($"Main D ({combatant.ID})", fontTiny)))
-                        tableActions.AddCell(New PdfPCell(New Phrase($"Zone MD ({combatant.ID})", fontTiny)))
-                        If showTargetColumnsGrid Then tableActions.AddCell(New PdfPCell(New Phrase($"Cible MD ({combatant.ID})", fontTiny)))
-                        tableActions.AddCell(New PdfPCell(New Phrase($"Main G ({combatant.ID})", fontTiny)))
-                        tableActions.AddCell(New PdfPCell(New Phrase($"Zone MG ({combatant.ID})", fontTiny)))
-                        If showTargetColumnsGrid Then tableActions.AddCell(New PdfPCell(New Phrase($"Cible MG ({combatant.ID})", fontTiny)))
-                        tableActions.AddCell(New PdfPCell(New Phrase($"Dépl. ({combatant.ID})", fontTiny)))
-                        tableActions.AddCell(New PdfPCell(New Phrase($"Com. ({combatant.ID})", fontTiny)))
+                    ' Largeur pour chaque colonne d'action
+                    Dim actionColumnWidth As Single = 1.0F ' Largeur par défaut pour une colonne d'action
+                    If numActions > 10 Then ' Réduire la largeur si beaucoup d'actions
+                        actionColumnWidth = 0.8F
+                    ElseIf numActions > 20 Then ' Encore plus petite si très très nombreuses
+                        actionColumnWidth = 0.5F
+                    End If
+
+                    For i As Integer = 0 To numActions - 1
+                        widths.Add(actionColumnWidth)
+                    Next
+                    If widths.Count = totalColumnsTableActions Then
+                        tableActionsInverted.SetWidths(widths.ToArray())
+                    End If
+
+                    ' --- Ligne d'en-tête du tableau (Numéros d'Action) ---
+                    tableActionsInverted.AddCell(New PdfPCell(New Phrase("N° Action", fontSmall))) ' Entête fixe pour les numéros
+
+                    Dim orderedActions As List(Of Action) = phrase.ListeActions.OrderBy(Function(a) a.NumeroAction).ToList()
+                    For Each action As Action In orderedActions
+                        tableActionsInverted.AddCell(New PdfPCell(New Phrase(CStr(action.NumeroAction), fontTiny)))
                     Next
 
-                    ' Remplir les lignes du tableau d'actions
-                    For Each action As Action In phrase.ListeActions.OrderBy(Function(a) a.NumeroAction) ' Ordre des actions
-                        tableActions.AddCell(New PdfPCell(New Phrase(CStr(action.NumeroAction), fontTiny)))
+                    ' --- Lignes pour chaque Combattant et leurs mouvements ---
+                    For Each projectCombatant As Combattant In currentProjet.ListeCombattants.OrderBy(Function(c) c.ID)
+                        ' Ligne pour le nom du Combattant (étend sur toutes les colonnes)
+                        Dim cellCombatantName As New PdfPCell(New Phrase($"{projectCombatant.Nom} {projectCombatant.Prenom} (ID: {projectCombatant.ID})", fontSmall))
+                        cellCombatantName.Colspan = totalColumnsTableActions
+                        cellCombatantName.BackgroundColor = New BaseColor(240, 240, 240) ' Légère couleur de fond pour distinguer
+                        cellCombatantName.HorizontalAlignment = Element.ALIGN_LEFT
+                        tableActionsInverted.AddCell(cellCombatantName)
 
-                        For Each projectCombatant As Combattant In currentProjet.ListeCombattants
-                            Dim mouvementForCombatant As Mouvement = action.Mouvements.FirstOrDefault(Function(m) m.CombattantID = projectCombatant.ID)
+                        ' Liste des propriétés de mouvement à afficher
+                        Dim mouvementProperties As New List(Of String) From {"MainDroite", "ZoneMainDroite", "CibleMainDroiteID",
+                                                                             "MainGauche", "ZoneMainGauche", "CibleMainGaucheID",
+                                                                             "Deplacement", "CommentaireEtPouvoirForce"}
 
-                            If mouvementForCombatant IsNot Nothing Then
-                                tableActions.AddCell(New PdfPCell(New Phrase(mouvementForCombatant.MainDroite, fontTiny)))
-                                tableActions.AddCell(New PdfPCell(New Phrase(mouvementForCombatant.ZoneMainDroite, fontTiny)))
-                                If showTargetColumnsGrid Then
-                                    ' *** MODIFICATION ICI : Convertir 0 en chaîne vide pour CibleMainDroiteID ***
-                                    Dim cibleMDText As String = If(mouvementForCombatant.CibleMainDroiteID = 0, "", CStr(mouvementForCombatant.CibleMainDroiteID))
-                                    tableActions.AddCell(New PdfPCell(New Phrase(cibleMDText, fontTiny)))
+                        ' Pour chaque propriété de mouvement (Main Droite, Zone MD, etc.)
+                        For Each propName As String In mouvementProperties
+                            Dim headerText As String = ""
+
+                            Select Case propName
+                                Case "MainDroite" : headerText = "Main D"
+                                Case "ZoneMainDroite" : headerText = "Zone MD"
+                                Case "CibleMainDroiteID" : headerText = "Cible MD"
+                                Case "MainGauche" : headerText = "Main G"
+                                Case "ZoneMainGauche" : headerText = "Zone MG"
+                                Case "CibleMainGaucheID" : headerText = "Cible MG"
+                                Case "Deplacement" : headerText = "Dépl."
+                                Case "CommentaireEtPouvoirForce" : headerText = "Com."
+                            End Select
+
+                            tableActionsInverted.AddCell(New PdfPCell(New Phrase(headerText, fontTiny))) ' Entête de ligne fixe
+
+                            ' Remplir les données pour cette propriété pour toutes les actions
+                            For Each action As Action In orderedActions
+                                Dim mouvementForCombatant As Mouvement = action.Mouvements.FirstOrDefault(Function(m) m.CombattantID = projectCombatant.ID)
+                                Dim cellValue As String = ""
+
+                                If mouvementForCombatant IsNot Nothing Then
+                                    Select Case propName
+                                        Case "MainDroite" : cellValue = mouvementForCombatant.MainDroite
+                                        Case "ZoneMainDroite" : cellValue = mouvementForCombatant.ZoneMainDroite
+                                        Case "CibleMainDroiteID" : cellValue = If(mouvementForCombatant.CibleMainDroiteID = 0, "", CStr(mouvementForCombatant.CibleMainDroiteID))
+                                        Case "MainGauche" : cellValue = mouvementForCombatant.MainGauche
+                                        Case "ZoneMainGauche" : cellValue = mouvementForCombatant.ZoneMainGauche
+                                        Case "CibleMainGaucheID" : cellValue = If(mouvementForCombatant.CibleMainGaucheID = 0, "", CStr(mouvementForCombatant.CibleMainGaucheID))
+                                        Case "Deplacement" : cellValue = mouvementForCombatant.Deplacement
+                                        Case "CommentaireEtPouvoirForce" : cellValue = $"{mouvementForCombatant.Commentaire} {mouvementForCombatant.PouvoirForce}".Trim()
+                                    End Select
                                 End If
-                                tableActions.AddCell(New PdfPCell(New Phrase(mouvementForCombatant.MainGauche, fontTiny)))
-                                tableActions.AddCell(New PdfPCell(New Phrase(mouvementForCombatant.ZoneMainGauche, fontTiny)))
-                                If showTargetColumnsGrid Then
-                                    ' *** MODIFICATION ICI : Convertir 0 en chaîne vide pour CibleMainGaucheID ***
-                                    Dim cibleMGText As String = If(mouvementForCombatant.CibleMainGaucheID = 0, "", CStr(mouvementForCombatant.CibleMainGaucheID))
-                                    tableActions.AddCell(New PdfPCell(New Phrase(cibleMGText, fontTiny)))
-                                End If
-                                tableActions.AddCell(New PdfPCell(New Phrase(mouvementForCombatant.Deplacement, fontTiny)))
-                                tableActions.AddCell(New PdfPCell(New Phrase($"{mouvementForCombatant.Commentaire} {mouvementForCombatant.PouvoirForce}".Trim(), fontTiny)))
-                            Else
-                                ' Cellules vides pour les mouvements non trouvés (utiliser fontTiny pour la cohérence)
-                                tableActions.AddCell(New PdfPCell(New Phrase("", fontTiny))) ' <-- Changé de fontSmall à fontTiny
-                                tableActions.AddCell(New PdfPCell(New Phrase("", fontTiny))) ' <-- Changé de fontSmall à fontTiny
-                                If showTargetColumnsGrid Then tableActions.AddCell(New PdfPCell(New Phrase("", fontTiny))) ' <-- Changé de fontSmall à fontTiny
-                                tableActions.AddCell(New PdfPCell(New Phrase("", fontTiny))) ' <-- Changé de fontSmall à fontTiny
-                                tableActions.AddCell(New PdfPCell(New Phrase("", fontTiny))) ' <-- Changé de fontSmall à fontTiny
-                                If showTargetColumnsGrid Then tableActions.AddCell(New PdfPCell(New Phrase("", fontTiny))) ' <-- Changé de fontSmall à fontTiny
-                                tableActions.AddCell(New PdfPCell(New Phrase("", fontTiny))) ' <-- Changé de fontSmall à fontTiny
-                                tableActions.AddCell(New PdfPCell(New Phrase("", fontTiny))) ' <-- Changé de fontSmall à fontTiny
-                            End If
+                                tableActionsInverted.AddCell(New PdfPCell(New Phrase(cellValue, fontTiny)))
+                            Next
                         Next
                     Next
-                    doc.Add(tableActions)
+
+                    doc.Add(tableActionsInverted)
                     doc.Add(New Paragraph(Environment.NewLine)) ' Ligne vide après chaque tableau d'actions
                 Next
 
@@ -508,7 +557,6 @@ Public Class Form1
             End Try
         End If
     End Sub
-
 End Class
 
 

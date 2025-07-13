@@ -1,5 +1,5 @@
 ﻿Main;Deplacement;Zone
-"";"";""
+;;
 Amputer;Appel;Zone 1
 Attaque;Balestra;Zone 2
 Attaque du Faucon (l');Bond arrière;Zone 3
@@ -55,6 +55,8 @@ Froissement;;
 Nuée de Lames;;
 Nuée de Lames;;
 Parade;;
+Parade Nadir;;
+Parade  Zenith;;
 Parade inversée;;
 Prise de lame;;
 Parade verticale;;

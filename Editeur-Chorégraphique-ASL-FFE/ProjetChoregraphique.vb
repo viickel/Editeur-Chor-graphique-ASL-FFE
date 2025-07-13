@@ -21,7 +21,7 @@ Public Class ProjetChoregraphique
         ListeCombattants = New List(Of Combattant)()
         ListeAssistants = New List(Of Assistant)()
         ChoregraphieSections = New List(Of PhraseDArmes)()
-        Me.Duree = "00:00:00" ' Initialiser avec une chaîne par défaut
+        Me.Duree = "00m:00s" ' Initialiser avec une chaîne par défaut
     End Sub
 
 
