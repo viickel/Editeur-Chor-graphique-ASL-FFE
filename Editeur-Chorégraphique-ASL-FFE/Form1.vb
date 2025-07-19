@@ -424,8 +424,6 @@ Public Class Form1
             Dim filePath As String = saveFileDialog.FileName
 
             Try
-                ' *** DÉBUT DES NOUVELLES MODIFICATIONS ***
-
                 ' Récupérer la taille de page et l'orientation choisie par l'utilisateur
                 Dim pageSize As iTextSharp.text.Rectangle
                 Dim selectedPageSize As String = cboPageSize.SelectedItem.ToString() ' Récupère le texte sélectionné
@@ -449,8 +447,6 @@ Public Class Form1
                 ' La marge du bas à 50 est bonne pour laisser de la place au numéro de page
                 Dim doc As New Document(pageSize, 30, 30, 30, 50)
 
-                ' *** FIN DES NOUVELLES MODIFICATIONS ***
-
                 ' 2. Créer un PdfWriter pour écrire le document dans un fichier
                 Dim writer As PdfWriter = PdfWriter.GetInstance(doc, New FileStream(filePath, FileMode.Create))
 
@@ -467,41 +463,40 @@ Public Class Form1
                 Dim fontNormal As Font = FontFactory.GetFont(FontFactory.HELVETICA, 12, BaseColor.BLACK)
                 Dim fontSmall As Font = FontFactory.GetFont(FontFactory.HELVETICA, 10, BaseColor.GRAY)
                 Dim fontTiny As Font = FontFactory.GetFont(FontFactory.HELVETICA, 8, BaseColor.BLACK) ' Police pour les données de tableau
-                Dim fontCapitaineBold As Font = New Font(fontNormal.Family, fontNormal.Size, Font.Bold, fontNormal.Color)
+                Dim fontCapitaineBold As Font = FontFactory.GetFont(FontFactory.HELVETICA_BOLD, 12, BaseColor.BLACK) ' Police pour le mot "Capitaine" en gras
 
 
-                ' --- Ajouter le titre, l'intrigue et le temps ---
+                ' --- Ajouter le titre, l'intrigue, le temps, le club et la catégorie ---
                 doc.Add(New Paragraph("Titre : " & currentProjet.Titre, fontTitle))
-                doc.Add(New Paragraph("Intrigue : " & currentProjet.Intrigue, fontSubtitle))
 
-                ' *** DÉBUT DE LA CORRECTION POUR LA DURÉE (STRING) ***
+                If Not String.IsNullOrEmpty(currentProjet.Intrigue) Then
+                    doc.Add(New Paragraph("Intrigue : " & currentProjet.Intrigue, fontSubtitle))
+                End If
+
                 Dim tempsFormatted As String = ""
                 If Not String.IsNullOrEmpty(currentProjet.Duree) Then
                     tempsFormatted = $"Durée : {currentProjet.Duree}"
                 Else
-                    tempsFormatted = "Durée : Non spécifiée."
+                    tempsFormatted = ""
                 End If
-                doc.Add(New Paragraph(tempsFormatted, fontSubtitle)) ' Vous avez changé fontNormal en fontSubtitle ici, je le garde comme vous l'avez fait.
-                doc.Add(New Paragraph(Environment.NewLine)) ' Ligne vide après le temps
+                If Not String.IsNullOrEmpty(tempsFormatted) Then ' Seulement si c'est non vide
+                    doc.Add(New Paragraph(tempsFormatted, fontSubtitle))
+                End If
 
-                If Not currentProjet.NomDuClub Is Nothing Then
+                If Not String.IsNullOrEmpty(currentProjet.NomDuClub) Then
                     doc.Add(New Paragraph("Nom du Club : " & currentProjet.NomDuClub, fontSubtitle))
                 End If
 
-                doc.Add(New Paragraph("Catégorie : " & currentProjet.Categorie, fontSubtitle))
-                doc.Add(New Paragraph(Environment.NewLine)) ' Ligne vide après le temps
-
-
-
-                ' *** FIN DE LA CORRECTION POUR LA DURÉE (STRING) ***
+                If Not String.IsNullOrEmpty(currentProjet.Categorie) Then
+                    doc.Add(New Paragraph("Catégorie : " & currentProjet.Categorie, fontSubtitle))
+                End If
+                doc.Add(New Paragraph(Environment.NewLine)) ' Ligne vide après les infos générales
 
                 ' --- Tableau Combattants / Assistants ---
                 doc.Add(New Paragraph("Participants :", fontSubtitle))
                 Dim tableParticipants As New PdfPTable(2) ' 2 colonnes
                 tableParticipants.WidthPercentage = 100 ' Prend 100% de la largeur disponible
                 tableParticipants.SetWidths(New Single() {1, 1}) ' Largeur relative des colonnes
-
-                doc.Add(New Paragraph(Environment.NewLine)) ' Ligne vide - (Note: cette ligne vide avant les en-têtes du tableau pourrait être déplacée après tableParticipants.AddCell(tableParticipants))
 
                 ' En-têtes du tableau
                 tableParticipants.AddCell(New PdfPCell(New Phrase("Combattant", fontNormal)))
@@ -515,12 +510,14 @@ Public Class Form1
                     Dim combattantCell As New PdfPCell()
                     If i < currentProjet.ListeCombattants.Count Then
                         Dim c As Combattant = currentProjet.ListeCombattants(i)
+                        Dim phraseCombattant As New Phrase()
                         If c.Capitaine Then
-                            combattantCell.AddElement(New Phrase($"Capitaine {c.Nom} {c.Prenom} (ID: {c.ID}) (Licence: {c.NumeroLicence})", fontCapitaineBold))
+                            phraseCombattant.Add(New Chunk("Capitaine ", fontCapitaineBold))
+                            phraseCombattant.Add(New Chunk($"{c.Nom} {c.Prenom} (ID: {c.ID}) (Licence: {c.NumeroLicence})", fontNormal))
                         Else
-                            combattantCell.AddElement(New Phrase($"{c.Nom} {c.Prenom} (ID: {c.ID}) (Licence: {c.NumeroLicence})", fontNormal))
-
+                            phraseCombattant.Add(New Chunk($"{c.Nom} {c.Prenom} (ID: {c.ID}) (Licence: {c.NumeroLicence})", fontNormal))
                         End If
+                        combattantCell.AddElement(phraseCombattant)
                     Else
                         combattantCell.AddElement(New Phrase("")) ' Cellule vide si pas de combattant
                     End If
@@ -542,7 +539,7 @@ Public Class Form1
                 ' --- Phrases d'armes et leurs actions (Structure de tableau inversée) ---
                 Dim firstPhrase As Boolean = True
                 For Each phrase As PhraseDArmes In currentProjet.ChoregraphieSections.OrderBy(Function(p) p.Numero) ' S'assurer de l'ordre
-                    ' *** AJOUT : Saut de page pour chaque nouvelle phrase d'armes (sauf la toute première) ***
+                    ' Saut de page pour chaque nouvelle phrase d'armes (sauf la toute première)
                     If Not firstPhrase Then
                         doc.NewPage()
                     Else
@@ -568,7 +565,7 @@ Public Class Form1
 
                     ' Définir les largeurs des colonnes (vous devrez ajuster ces valeurs)
                     Dim widths As New List(Of Single)()
-                    widths.Add(2.0F) ' Largeur plus grande pour la colonne d'entête (ex: "Main D", "Zone MD")
+                    widths.Add(1.0F) ' Largeur plus grande pour la colonne d'entête (ex: "N° Action")
 
                     ' Largeur pour chaque colonne d'action
                     Dim actionColumnWidth As Single = 1.0F ' Largeur par défaut pour une colonne d'action
@@ -604,8 +601,8 @@ Public Class Form1
 
                         ' Liste des propriétés de mouvement à afficher
                         Dim mouvementProperties As New List(Of String) From {"MainDroite", "ZoneMainDroite", "CibleMainDroiteID",
-                                                                             "MainGauche", "ZoneMainGauche", "CibleMainGaucheID",
-                                                                             "Deplacement", "CommentaireEtPouvoirForce"}
+                                                                         "MainGauche", "ZoneMainGauche", "CibleMainGaucheID",
+                                                                         "Deplacement", "CommentaireEtPouvoirForce"}
 
                         ' Pour chaque propriété de mouvement (Main Droite, Zone MD, etc.)
                         For Each propName As String In mouvementProperties
@@ -622,7 +619,12 @@ Public Class Form1
                                 Case "CommentaireEtPouvoirForce" : headerText = "Com."
                             End Select
 
-                            tableActionsInverted.AddCell(New PdfPCell(New Phrase(headerText, fontTiny))) ' Entête de ligne fixe
+                            ' *** LOGIQUE CORRIGÉE POUR SAUTER LES LIGNES VIDES ***
+                            Dim rowCellsForThisProperty As New List(Of PdfPCell)()
+                            Dim hasAnyData As Boolean = False ' Indicateur pour savoir si la ligne contient des données
+
+                            ' Ajouter l'entête de ligne fixe
+                            rowCellsForThisProperty.Add(New PdfPCell(New Phrase(headerText, fontTiny)))
 
                             ' Remplir les données pour cette propriété pour toutes les actions
                             For Each action As Action In orderedActions
@@ -641,8 +643,24 @@ Public Class Form1
                                         Case "CommentaireEtPouvoirForce" : cellValue = $"{mouvementForCombatant.Commentaire} {mouvementForCombatant.PouvoirForce}".Trim()
                                     End Select
                                 End If
-                                tableActionsInverted.AddCell(New PdfPCell(New Phrase(cellValue, fontTiny)))
+
+                                ' Ajouter la cellule à la liste temporaire
+                                rowCellsForThisProperty.Add(New PdfPCell(New Phrase(cellValue, fontTiny)))
+
+                                ' Si la valeur n'est pas vide, marquer qu'il y a des données dans cette ligne
+                                If Not String.IsNullOrEmpty(cellValue) Then
+                                    hasAnyData = True
+                                End If
                             Next
+
+                            ' N'ajouter la ligne au tableau que si elle contient des données (en dehors de l'en-tête de ligne)
+                            If hasAnyData Then
+                                For Each cellToAdd As PdfPCell In rowCellsForThisProperty
+                                    tableActionsInverted.AddCell(cellToAdd)
+                                Next
+                            End If
+                            ' *** FIN DE LA LOGIQUE CORRIGÉE ***
+
                         Next
                     Next
 

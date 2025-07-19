@@ -290,8 +290,9 @@ Partial Class Form1
         ' 
         ' lblCategorie
         ' 
+        lblCategorie.Anchor = AnchorStyles.Bottom Or AnchorStyles.Left Or AnchorStyles.Right
         lblCategorie.AutoSize = True
-        lblCategorie.Location = New Point(6, 271)
+        lblCategorie.Location = New Point(6, 286)
         lblCategorie.Name = "lblCategorie"
         lblCategorie.Size = New Size(33, 20)
         lblCategorie.TabIndex = 10
@@ -299,8 +300,9 @@ Partial Class Form1
         ' 
         ' chkMouvementEnsemble
         ' 
+        chkMouvementEnsemble.Anchor = AnchorStyles.Bottom Or AnchorStyles.Left Or AnchorStyles.Right
         chkMouvementEnsemble.AutoSize = True
-        chkMouvementEnsemble.Location = New Point(3, 319)
+        chkMouvementEnsemble.Location = New Point(292, 286)
         chkMouvementEnsemble.Name = "chkMouvementEnsemble"
         chkMouvementEnsemble.Size = New Size(190, 24)
         chkMouvementEnsemble.TabIndex = 9
@@ -309,6 +311,7 @@ Partial Class Form1
         ' 
         ' txtNomClub
         ' 
+        txtNomClub.Anchor = AnchorStyles.Bottom Or AnchorStyles.Left
         txtNomClub.Location = New Point(3, 230)
         txtNomClub.Name = "txtNomClub"
         txtNomClub.Size = New Size(512, 27)
@@ -316,6 +319,7 @@ Partial Class Form1
         ' 
         ' Label3
         ' 
+        Label3.Anchor = AnchorStyles.Bottom Or AnchorStyles.Left
         Label3.AutoSize = True
         Label3.Location = New Point(3, 207)
         Label3.Name = "Label3"
@@ -341,7 +345,7 @@ Partial Class Form1
         ' 
         ' Form1
         ' 
-        AutoScaleDimensions = New SizeF(8.0F, 20.0F)
+        AutoScaleDimensions = New SizeF(8F, 20F)
         AutoScaleMode = AutoScaleMode.Font
         ClientSize = New Size(800, 670)
         Controls.Add(SplitContainer2)
