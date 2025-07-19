@@ -201,6 +201,9 @@ Public Class Form1
         ' Section "Durée" (TextBox1 est le nom du contrôle pour la durée)
         TextBox1.Text = currentProjet.Duree
 
+        'section Nom du club
+        txtNomClub.Text = currentProjet.NomDuClub
+
         ' Section "Combattants" (avec la nouvelle ListBox)
         bsCombattantsDisplay.DataSource = currentProjet.ListeCombattants
         bsCombattantsDisplay.ResetBindings(False) ' Rafraîchit l'affichage
@@ -219,7 +222,7 @@ Public Class Form1
         currentProjet.Titre = Title_Box.Text
         currentProjet.Intrigue = Rich_Intrigue.Text
         currentProjet.Duree = TextBox1.Text
-
+        currentProjet.NomDuClub = txtNomClub.Text
 
 
         ' Important : Pour les RichTextBox des combattants et assistants,
@@ -249,6 +252,11 @@ Public Class Form1
 
     ' Marquer le projet comme modifié lorsque la durée change
     Private Sub TextBox1_TextChanged(sender As Object, e As EventArgs) Handles TextBox1.TextChanged
+        MarkAsDirty()
+    End Sub
+
+    'marquer le projet comme modifié lorsque le nom du club change
+    Private Sub txtNomClub_TextChanged(sender As Object, e As EventArgs) Handles txtNomClub.TextChanged
         MarkAsDirty()
     End Sub
 
@@ -408,6 +416,8 @@ Public Class Form1
                 Dim fontNormal As Font = FontFactory.GetFont(FontFactory.HELVETICA, 12, BaseColor.BLACK)
                 Dim fontSmall As Font = FontFactory.GetFont(FontFactory.HELVETICA, 10, BaseColor.GRAY)
                 Dim fontTiny As Font = FontFactory.GetFont(FontFactory.HELVETICA, 8, BaseColor.BLACK) ' Police pour les données de tableau
+                Dim fontCapitaineBold As Font = New Font(fontNormal.Family, fontNormal.Size, Font.Bold, fontNormal.Color)
+
 
                 ' --- Ajouter le titre, l'intrigue et le temps ---
                 doc.Add(New Paragraph("Titre : " & currentProjet.Titre, fontTitle))
@@ -444,7 +454,12 @@ Public Class Form1
                     Dim combattantCell As New PdfPCell()
                     If i < currentProjet.ListeCombattants.Count Then
                         Dim c As Combattant = currentProjet.ListeCombattants(i)
-                        combattantCell.AddElement(New Phrase($"{c.Nom} {c.Prenom} (ID: {c.ID}) (Licence: {c.NumeroLicence})", fontNormal))
+                        If c.Capitaine Then
+                            combattantCell.AddElement(New Phrase($"Capitaine {c.Nom} {c.Prenom} (ID: {c.ID}) (Licence: {c.NumeroLicence})", fontCapitaineBold))
+                        Else
+                            combattantCell.AddElement(New Phrase($"{c.Nom} {c.Prenom} (ID: {c.ID}) (Licence: {c.NumeroLicence})", fontNormal))
+
+                        End If
                     Else
                         combattantCell.AddElement(New Phrase("")) ' Cellule vide si pas de combattant
                     End If
@@ -583,6 +598,10 @@ Public Class Form1
                 MessageBox.Show($"Une erreur est survenue lors de la génération du PDF : {ex.Message}", "Erreur PDF", MessageBoxButtons.OK, MessageBoxIcon.Error)
             End Try
         End If
+    End Sub
+
+    Private Sub SplitContainer1_Panel2_Paint(sender As Object, e As PaintEventArgs) Handles SplitContainer1.Panel2.Paint
+
     End Sub
 End Class
 

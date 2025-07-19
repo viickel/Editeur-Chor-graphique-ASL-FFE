@@ -37,6 +37,8 @@ Partial Class FormEditCombattants
         btnDelete = New Button()
         btnCancel = New Button()
         btnSaveAndClose = New Button()
+        Label1 = New Label()
+        chkCapitaine = New CheckBox()
         GroupBox1.SuspendLayout()
         SuspendLayout()
         ' 
@@ -46,12 +48,14 @@ Partial Class FormEditCombattants
         lstCombattants.FormattingEnabled = True
         lstCombattants.Location = New Point(41, 12)
         lstCombattants.Name = "lstCombattants"
-        lstCombattants.Size = New Size(373, 184)
+        lstCombattants.Size = New Size(373, 204)
         lstCombattants.TabIndex = 0
         ' 
         ' GroupBox1
         ' 
         GroupBox1.Anchor = AnchorStyles.Top Or AnchorStyles.Right
+        GroupBox1.Controls.Add(chkCapitaine)
+        GroupBox1.Controls.Add(Label1)
         GroupBox1.Controls.Add(txtLicence)
         GroupBox1.Controls.Add(txtPrenom)
         GroupBox1.Controls.Add(txtNom)
@@ -62,37 +66,37 @@ Partial Class FormEditCombattants
         GroupBox1.Controls.Add(labelID)
         GroupBox1.Location = New Point(438, 12)
         GroupBox1.Name = "GroupBox1"
-        GroupBox1.Size = New Size(350, 184)
+        GroupBox1.Size = New Size(350, 223)
         GroupBox1.TabIndex = 1
         GroupBox1.TabStop = False
         GroupBox1.Text = "Détails du Combattant"
         ' 
         ' txtLicence
         ' 
-        txtLicence.Location = New Point(107, 142)
+        txtLicence.Location = New Point(117, 142)
         txtLicence.Name = "txtLicence"
-        txtLicence.Size = New Size(237, 27)
+        txtLicence.Size = New Size(227, 27)
         txtLicence.TabIndex = 7
         ' 
         ' txtPrenom
         ' 
-        txtPrenom.Location = New Point(107, 107)
+        txtPrenom.Location = New Point(117, 107)
         txtPrenom.Name = "txtPrenom"
-        txtPrenom.Size = New Size(237, 27)
+        txtPrenom.Size = New Size(227, 27)
         txtPrenom.TabIndex = 6
         ' 
         ' txtNom
         ' 
-        txtNom.Location = New Point(107, 71)
+        txtNom.Location = New Point(117, 71)
         txtNom.Name = "txtNom"
-        txtNom.Size = New Size(237, 27)
+        txtNom.Size = New Size(227, 27)
         txtNom.TabIndex = 5
         ' 
         ' txtID
         ' 
-        txtID.Location = New Point(107, 35)
+        txtID.Location = New Point(117, 35)
         txtID.Name = "txtID"
-        txtID.Size = New Size(237, 27)
+        txtID.Size = New Size(227, 27)
         txtID.TabIndex = 4
         ' 
         ' labelLicence
@@ -176,11 +180,30 @@ Partial Class FormEditCombattants
         btnSaveAndClose.Text = "Valider et fermer"
         btnSaveAndClose.UseVisualStyleBackColor = True
         ' 
+        ' Label1
+        ' 
+        Label1.AutoSize = True
+        Label1.Location = New Point(39, 184)
+        Label1.Name = "Label1"
+        Label1.Size = New Size(72, 20)
+        Label1.TabIndex = 8
+        Label1.Text = "Capitaine"
+        ' 
+        ' chkCapitaine
+        ' 
+        chkCapitaine.AutoSize = True
+        chkCapitaine.Location = New Point(117, 184)
+        chkCapitaine.Name = "chkCapitaine"
+        chkCapitaine.Size = New Size(39, 24)
+        chkCapitaine.TabIndex = 9
+        chkCapitaine.Text = "  "
+        chkCapitaine.UseVisualStyleBackColor = True
+        ' 
         ' FormEditCombattants
         ' 
         AutoScaleDimensions = New SizeF(8F, 20F)
         AutoScaleMode = AutoScaleMode.Font
-        ClientSize = New Size(800, 450)
+        ClientSize = New Size(800, 307)
         Controls.Add(btnSaveAndClose)
         Controls.Add(btnCancel)
         Controls.Add(btnDelete)
@@ -210,4 +233,6 @@ Partial Class FormEditCombattants
     Friend WithEvents txtLicence As TextBox
     Friend WithEvents txtPrenom As TextBox
     Friend WithEvents txtNom As TextBox
+    Friend WithEvents chkCapitaine As CheckBox
+    Friend WithEvents Label1 As Label
 End Class

@@ -22,6 +22,8 @@ Partial Class Form1
     'Do not modify it using the code editor.
     <System.Diagnostics.DebuggerStepThrough()>
     Private Sub InitializeComponent()
+        components = New ComponentModel.Container()
+        Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(Form1))
         Bt_Open = New Button()
         Bt_Save = New Button()
         Bt_Save_As = New Button()
@@ -43,11 +45,21 @@ Partial Class Form1
         btnGeneratePdf = New Button()
         cboPageSize = New ComboBox()
         GroupBox1 = New GroupBox()
+        SplitContainer2 = New SplitContainer()
+        txtNomClub = New TextBox()
+        Label3 = New Label()
+        PictureBox2 = New PictureBox()
+        ContextMenuStrip1 = New ContextMenuStrip(components)
         CType(SplitContainer1, ComponentModel.ISupportInitialize).BeginInit()
         SplitContainer1.Panel1.SuspendLayout()
         SplitContainer1.Panel2.SuspendLayout()
         SplitContainer1.SuspendLayout()
         GroupBox1.SuspendLayout()
+        CType(SplitContainer2, ComponentModel.ISupportInitialize).BeginInit()
+        SplitContainer2.Panel1.SuspendLayout()
+        SplitContainer2.Panel2.SuspendLayout()
+        SplitContainer2.SuspendLayout()
+        CType(PictureBox2, ComponentModel.ISupportInitialize).BeginInit()
         SuspendLayout()
         ' 
         ' Bt_Open
@@ -97,16 +109,16 @@ Partial Class Form1
         ' Rich_Intrigue
         ' 
         Rich_Intrigue.Anchor = AnchorStyles.Top Or AnchorStyles.Bottom Or AnchorStyles.Left Or AnchorStyles.Right
-        Rich_Intrigue.Location = New Point(27, 144)
+        Rich_Intrigue.Location = New Point(3, 23)
         Rich_Intrigue.Name = "Rich_Intrigue"
-        Rich_Intrigue.Size = New Size(752, 132)
+        Rich_Intrigue.Size = New Size(512, 162)
         Rich_Intrigue.TabIndex = 5
         Rich_Intrigue.Text = ""
         ' 
         ' Label_Intrigue
         ' 
         Label_Intrigue.AutoSize = True
-        Label_Intrigue.Location = New Point(27, 121)
+        Label_Intrigue.Location = New Point(3, 0)
         Label_Intrigue.Name = "Label_Intrigue"
         Label_Intrigue.Size = New Size(60, 20)
         Label_Intrigue.TabIndex = 6
@@ -150,8 +162,8 @@ Partial Class Form1
         ' 
         ' SplitContainer1
         ' 
-        SplitContainer1.Anchor = AnchorStyles.Bottom Or AnchorStyles.Left Or AnchorStyles.Right
-        SplitContainer1.Location = New Point(27, 299)
+        SplitContainer1.Dock = DockStyle.Bottom
+        SplitContainer1.Location = New Point(0, 476)
         SplitContainer1.Name = "SplitContainer1"
         ' 
         ' SplitContainer1.Panel1
@@ -165,8 +177,8 @@ Partial Class Form1
         SplitContainer1.Panel2.Controls.Add(lstAssistantsDisplay)
         SplitContainer1.Panel2.Controls.Add(Bt_Edit_assistant)
         SplitContainer1.Panel2.Controls.Add(Label_Assistant)
-        SplitContainer1.Size = New Size(752, 194)
-        SplitContainer1.SplitterDistance = 387
+        SplitContainer1.Size = New Size(800, 194)
+        SplitContainer1.SplitterDistance = 411
         SplitContainer1.TabIndex = 13
         ' 
         ' lstCombattants
@@ -252,24 +264,76 @@ Partial Class Form1
         GroupBox1.TabStop = False
         GroupBox1.Text = "Génération PDF"
         ' 
+        ' SplitContainer2
+        ' 
+        SplitContainer2.Anchor = AnchorStyles.Top Or AnchorStyles.Bottom Or AnchorStyles.Left Or AnchorStyles.Right
+        SplitContainer2.Location = New Point(27, 124)
+        SplitContainer2.Name = "SplitContainer2"
+        ' 
+        ' SplitContainer2.Panel1
+        ' 
+        SplitContainer2.Panel1.Controls.Add(txtNomClub)
+        SplitContainer2.Panel1.Controls.Add(Label3)
+        SplitContainer2.Panel1.Controls.Add(Rich_Intrigue)
+        SplitContainer2.Panel1.Controls.Add(Label_Intrigue)
+        ' 
+        ' SplitContainer2.Panel2
+        ' 
+        SplitContainer2.Panel2.Controls.Add(PictureBox2)
+        SplitContainer2.Size = New Size(761, 346)
+        SplitContainer2.SplitterDistance = 531
+        SplitContainer2.TabIndex = 22
+        ' 
+        ' txtNomClub
+        ' 
+        txtNomClub.Location = New Point(3, 230)
+        txtNomClub.Name = "txtNomClub"
+        txtNomClub.Size = New Size(512, 27)
+        txtNomClub.TabIndex = 8
+        ' 
+        ' Label3
+        ' 
+        Label3.AutoSize = True
+        Label3.Location = New Point(3, 207)
+        Label3.Name = "Label3"
+        Label3.Size = New Size(95, 20)
+        Label3.TabIndex = 7
+        Label3.Text = "Nom du club"
+        ' 
+        ' PictureBox2
+        ' 
+        PictureBox2.Image = My.Resources.Resources.Judith
+        PictureBox2.Location = New Point(0, 3)
+        PictureBox2.Name = "PictureBox2"
+        PictureBox2.Size = New Size(226, 200)
+        PictureBox2.SizeMode = PictureBoxSizeMode.StretchImage
+        PictureBox2.TabIndex = 0
+        PictureBox2.TabStop = False
+        ' 
+        ' ContextMenuStrip1
+        ' 
+        ContextMenuStrip1.ImageScalingSize = New Size(20, 20)
+        ContextMenuStrip1.Name = "ContextMenuStrip1"
+        ContextMenuStrip1.Size = New Size(61, 4)
+        ' 
         ' Form1
         ' 
         AutoScaleDimensions = New SizeF(8F, 20F)
         AutoScaleMode = AutoScaleMode.Font
-        ClientSize = New Size(800, 524)
+        ClientSize = New Size(800, 670)
+        Controls.Add(SplitContainer2)
         Controls.Add(GroupBox1)
         Controls.Add(Bt_New)
         Controls.Add(Label2)
         Controls.Add(TextBox1)
         Controls.Add(Bt_Editer_Chore)
         Controls.Add(SplitContainer1)
-        Controls.Add(Label_Intrigue)
-        Controls.Add(Rich_Intrigue)
         Controls.Add(Label_Titre)
         Controls.Add(Title_Box)
         Controls.Add(Bt_Save_As)
         Controls.Add(Bt_Save)
         Controls.Add(Bt_Open)
+        Icon = CType(resources.GetObject("$this.Icon"), Icon)
         Name = "Form1"
         Text = "Editeur Chorégraphique"
         SplitContainer1.Panel1.ResumeLayout(False)
@@ -279,6 +343,12 @@ Partial Class Form1
         CType(SplitContainer1, ComponentModel.ISupportInitialize).EndInit()
         SplitContainer1.ResumeLayout(False)
         GroupBox1.ResumeLayout(False)
+        SplitContainer2.Panel1.ResumeLayout(False)
+        SplitContainer2.Panel1.PerformLayout()
+        SplitContainer2.Panel2.ResumeLayout(False)
+        CType(SplitContainer2, ComponentModel.ISupportInitialize).EndInit()
+        SplitContainer2.ResumeLayout(False)
+        CType(PictureBox2, ComponentModel.ISupportInitialize).EndInit()
         ResumeLayout(False)
         PerformLayout()
     End Sub
@@ -307,5 +377,10 @@ Partial Class Form1
     Friend WithEvents btnGeneratePdf As Button
     Friend WithEvents cboPageSize As ComboBox
     Friend WithEvents GroupBox1 As GroupBox
+    Friend WithEvents SplitContainer2 As SplitContainer
+    Friend WithEvents PictureBox2 As PictureBox
+    Friend WithEvents ContextMenuStrip1 As ContextMenuStrip
+    Friend WithEvents txtNomClub As TextBox
+    Friend WithEvents Label3 As Label
 
 End Class

@@ -31,6 +31,7 @@ Public Class FormEditCombattants
         txtNom.Text = ""
         txtPrenom.Text = ""
         txtLicence.Text = ""
+        chkCapitaine.Checked = False ' Réinitialise la case à cocher
         currentSelectedCombattant = Nothing ' Réinitialise le combattant sélectionné
         txtNom.Focus() ' Donne le focus au premier champ
         btnUpdate.Enabled = False
@@ -44,6 +45,7 @@ Public Class FormEditCombattants
             txtNom.Text = combattant.Nom
             txtPrenom.Text = combattant.Prenom
             txtLicence.Text = combattant.NumeroLicence
+            chkCapitaine.Checked = combattant.Capitaine
             currentSelectedCombattant = combattant
             btnUpdate.Enabled = True
             btnDelete.Enabled = True
@@ -75,7 +77,7 @@ Public Class FormEditCombattants
             newID = ListeCombattantsDuProjet.Max(Function(c) c.ID) + 1
         End If
 
-        Dim newCombattant As New Combattant(newID, txtNom.Text, txtPrenom.Text, txtLicence.Text)
+        Dim newCombattant As New Combattant(newID, txtNom.Text, txtPrenom.Text, txtLicence.Text, chkCapitaine.Checked)
         ListeCombattantsDuProjet.Add(newCombattant) ' Ajoute à la liste du projet
         bsCombattants.ResetBindings(False) ' Rafraîchit la ListBox
         ClearCombattantDetails() ' Prépare pour une nouvelle saisie
@@ -94,6 +96,7 @@ Public Class FormEditCombattants
             currentSelectedCombattant.Nom = txtNom.Text
             currentSelectedCombattant.Prenom = txtPrenom.Text
             currentSelectedCombattant.NumeroLicence = txtLicence.Text
+            currentSelectedCombattant.Capitaine = chkCapitaine.Checked
 
             bsCombattants.ResetBindings(False) ' Rafraîchit la ListBox pour afficher les changements
             ClearCombattantDetails()
