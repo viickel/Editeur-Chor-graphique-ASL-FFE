@@ -15,6 +15,10 @@ Public Class ProjetChoregraphique
     Public Property ListeAssistants As New List(Of Assistant)
     Public Property ChoregraphieSections As New List(Of PhraseDArmes)
 
+    Public Property Categorie As String ' Pour stocker "Duel", "Bataille", "Ensemble"
+    Public Property IsMouvementEnsemble As Boolean ' Pour stocker l'état de la case à cocher
+
+
 
 
     Public Sub New()

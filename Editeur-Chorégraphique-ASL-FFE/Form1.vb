@@ -3,7 +3,8 @@ Imports System.Xml.Serialization
 Imports System.Windows.Forms ' Assure-toi que cette importation est présente pour les contrôles UI
 Imports System.Globalization ' Pour TimeSpan.TryParseExact
 Imports iTextSharp.text ' Pour les classes de base (Document, Paragraph, etc.)
-Imports iTextSharp.text.pdf ' Pour PdfWriter, PdfPTable, etc.
+Imports iTextSharp.text.pdf
+Imports System.Drawing.Design ' Pour PdfWriter, PdfPTable, etc.
 
 Public Class Form1
 
@@ -34,6 +35,12 @@ Public Class Form1
         lstAssistantsDisplay.DisplayMember = "ToString" ' Utilise la fonction ToString() de Assistant
 
         NewProject()
+
+        DetermineAndSetCategorie() ' Détermine la catégorie au chargement/nouveau projet
+
+
+
+
     End Sub
 
     Private Sub NewProject()
@@ -212,6 +219,9 @@ Public Class Form1
         bsAssistantsDisplay.DataSource = currentProjet.ListeAssistants
         bsAssistantsDisplay.ResetBindings(False) ' Rafraîchit l'affichage
 
+        chkMouvementEnsemble.Checked = currentProjet.IsMouvementEnsemble ' Afficher l'état de la checkbox
+        lblCategorie.Text = $"Catégorie : {currentProjet.Categorie}" ' Afficher la catégorie calculée 
+
 
         ' Pour les boutons d'édition des combattants/assistants, ils n'affichent pas de données,
         ' ils ouvriront des formulaires de gestion dédiés plus tard.
@@ -223,6 +233,9 @@ Public Class Form1
         currentProjet.Intrigue = Rich_Intrigue.Text
         currentProjet.Duree = TextBox1.Text
         currentProjet.NomDuClub = txtNomClub.Text
+        currentProjet.IsMouvementEnsemble = chkMouvementEnsemble.Checked
+        ' Appel de la méthode pour déterminer et stocker la catégorie
+        DetermineAndSetCategorie()
 
 
         ' Important : Pour les RichTextBox des combattants et assistants,
@@ -235,6 +248,42 @@ Public Class Form1
         ' C'est pourquoi j'avais suggéré des ListBox plus tôt, car elles sont faites pour ça.
         ' On verra les dialogues d'édition plus tard.
     End Sub
+
+
+    Private Sub DetermineAndSetCategorie()
+        If currentProjet.ListeCombattants.Count > 2 Then
+            chkMouvementEnsemble.Visible = True ' Rendre la CheckBox visible
+
+        Else
+            chkMouvementEnsemble.Visible = False
+
+        End If
+
+
+
+        If currentProjet.ListeCombattants.Count = 1 Then
+            currentProjet.Categorie = "Kata"
+
+        ElseIf currentProjet.ListeCombattants.Count = 2 Then
+            currentProjet.Categorie = "Duel"
+
+        ElseIf currentProjet.ListeCombattants.Count > 2 And Not currentProjet.IsMouvementEnsemble Then
+            currentProjet.Categorie = "Bataille"
+
+        ElseIf currentProjet.ListeCombattants.Count > 2 And currentProjet.IsMouvementEnsemble Then
+            currentProjet.Categorie = "Ensemble"
+        Else
+            currentProjet.Categorie = "Non définie (Ajoutez des combattants)" ' Ou toute autre valeur par défaut
+        End If
+
+        ' Mettre à jour l'affichage de la catégorie sur le formulaire principal
+        If lblCategorie IsNot Nothing AndAlso Not lblCategorie.IsDisposed Then
+            lblCategorie.Text = $"Catégorie : {currentProjet.Categorie}"
+        End If
+
+        MarkAsDirty() ' La catégorie a changé, donc le projet est "dirty"
+    End Sub
+
 
     ' ====================================================================================
     ' GESTION DES MODIFICATIONS DE L'UI POUR MARQUER LE PROJET COMME "Sale" (Dirty)
@@ -284,6 +333,8 @@ Public Class Form1
 
                 ' La méthode DisplayCurrentProjectData rafraîchira le RichTextBox_Choregraphe
                 DisplayCurrentProjectData()
+
+                DetermineAndSetCategorie()
                 MarkAsDirty() ' Indique qu'il y a des modifications à sauvegarder
             ElseIf result = DialogResult.Cancel Then
                 ' Si l'utilisateur a annulé, il faut restaurer la liste originale si elle a été modifiée en direct.
@@ -432,6 +483,16 @@ Public Class Form1
                 End If
                 doc.Add(New Paragraph(tempsFormatted, fontSubtitle)) ' Vous avez changé fontNormal en fontSubtitle ici, je le garde comme vous l'avez fait.
                 doc.Add(New Paragraph(Environment.NewLine)) ' Ligne vide après le temps
+
+                If Not currentProjet.NomDuClub Is Nothing Then
+                    doc.Add(New Paragraph("Nom du Club : " & currentProjet.NomDuClub, fontSubtitle))
+                End If
+
+                doc.Add(New Paragraph("Catégorie : " & currentProjet.Categorie, fontSubtitle))
+                doc.Add(New Paragraph(Environment.NewLine)) ' Ligne vide après le temps
+
+
+
                 ' *** FIN DE LA CORRECTION POUR LA DURÉE (STRING) ***
 
                 ' --- Tableau Combattants / Assistants ---
@@ -602,6 +663,10 @@ Public Class Form1
 
     Private Sub SplitContainer1_Panel2_Paint(sender As Object, e As PaintEventArgs) Handles SplitContainer1.Panel2.Paint
 
+    End Sub
+
+    Private Sub chkMouvementEnsemble_CheckedChanged(sender As Object, e As EventArgs) Handles chkMouvementEnsemble.CheckedChanged
+        DetermineAndSetCategorie() ' Recalcule la catégorie
     End Sub
 End Class
 

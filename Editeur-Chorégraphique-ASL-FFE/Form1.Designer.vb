@@ -46,6 +46,8 @@ Partial Class Form1
         cboPageSize = New ComboBox()
         GroupBox1 = New GroupBox()
         SplitContainer2 = New SplitContainer()
+        lblCategorie = New Label()
+        chkMouvementEnsemble = New CheckBox()
         txtNomClub = New TextBox()
         Label3 = New Label()
         PictureBox2 = New PictureBox()
@@ -272,6 +274,8 @@ Partial Class Form1
         ' 
         ' SplitContainer2.Panel1
         ' 
+        SplitContainer2.Panel1.Controls.Add(lblCategorie)
+        SplitContainer2.Panel1.Controls.Add(chkMouvementEnsemble)
         SplitContainer2.Panel1.Controls.Add(txtNomClub)
         SplitContainer2.Panel1.Controls.Add(Label3)
         SplitContainer2.Panel1.Controls.Add(Rich_Intrigue)
@@ -283,6 +287,25 @@ Partial Class Form1
         SplitContainer2.Size = New Size(761, 346)
         SplitContainer2.SplitterDistance = 531
         SplitContainer2.TabIndex = 22
+        ' 
+        ' lblCategorie
+        ' 
+        lblCategorie.AutoSize = True
+        lblCategorie.Location = New Point(6, 271)
+        lblCategorie.Name = "lblCategorie"
+        lblCategorie.Size = New Size(33, 20)
+        lblCategorie.TabIndex = 10
+        lblCategorie.Text = "----"
+        ' 
+        ' chkMouvementEnsemble
+        ' 
+        chkMouvementEnsemble.AutoSize = True
+        chkMouvementEnsemble.Location = New Point(3, 319)
+        chkMouvementEnsemble.Name = "chkMouvementEnsemble"
+        chkMouvementEnsemble.Size = New Size(190, 24)
+        chkMouvementEnsemble.TabIndex = 9
+        chkMouvementEnsemble.Text = "Mouvement d'ensemble"
+        chkMouvementEnsemble.UseVisualStyleBackColor = True
         ' 
         ' txtNomClub
         ' 
@@ -318,7 +341,7 @@ Partial Class Form1
         ' 
         ' Form1
         ' 
-        AutoScaleDimensions = New SizeF(8F, 20F)
+        AutoScaleDimensions = New SizeF(8.0F, 20.0F)
         AutoScaleMode = AutoScaleMode.Font
         ClientSize = New Size(800, 670)
         Controls.Add(SplitContainer2)
@@ -382,5 +405,7 @@ Partial Class Form1
     Friend WithEvents ContextMenuStrip1 As ContextMenuStrip
     Friend WithEvents txtNomClub As TextBox
     Friend WithEvents Label3 As Label
+    Friend WithEvents chkMouvementEnsemble As CheckBox
+    Friend WithEvents lblCategorie As Label
 
 End Class
