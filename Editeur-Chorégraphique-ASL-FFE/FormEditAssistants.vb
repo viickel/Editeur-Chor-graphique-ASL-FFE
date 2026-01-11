@@ -31,6 +31,7 @@ Public Class FormEditAssistants
         txtNom.Text = ""
         txtPrenom.Text = ""
         txtLicence.Text = ""
+        TxtRole.Text = ""
         currentSelectedAssistant = Nothing ' Réinitialise l'assistant sélectionné
         txtNom.Focus() ' Donne le focus au premier champ
         btnUpdate.Enabled = False
@@ -43,6 +44,7 @@ Public Class FormEditAssistants
             txtNom.Text = assistant.Nom
             txtPrenom.Text = assistant.Prenom
             txtLicence.Text = assistant.NumeroLicence
+            TxtRole.Text = assistant.Role
             currentSelectedAssistant = assistant
             btnUpdate.Enabled = True
             btnDelete.Enabled = True
@@ -68,7 +70,7 @@ Public Class FormEditAssistants
             Return
         End If
 
-        Dim newAssistant As New Assistant(txtNom.Text, txtPrenom.Text, txtLicence.Text)
+        Dim newAssistant As New Assistant(txtNom.Text, txtPrenom.Text, txtLicence.Text, TxtRole.Text)
         ListeAssistantsDuProjet.Add(newAssistant) ' Ajoute à la liste du projet
         bsAssistants.ResetBindings(False) ' Rafraîchit la ListBox
         ClearAssistantDetails() ' Prépare pour une nouvelle saisie
@@ -87,6 +89,7 @@ Public Class FormEditAssistants
             currentSelectedAssistant.Nom = txtNom.Text
             currentSelectedAssistant.Prenom = txtPrenom.Text
             currentSelectedAssistant.NumeroLicence = txtLicence.Text
+            currentSelectedAssistant.Role = TxtRole.Text
 
             bsAssistants.ResetBindings(False) ' Rafraîchit la ListBox pour afficher les changements
             DisplayAssistantDetails(currentSelectedAssistant) ' Réafficher les détails mis à jour

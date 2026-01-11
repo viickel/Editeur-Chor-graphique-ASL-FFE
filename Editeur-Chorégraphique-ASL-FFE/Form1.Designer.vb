@@ -50,7 +50,9 @@ Partial Class Form1
         chkMouvementEnsemble = New CheckBox()
         txtNomClub = New TextBox()
         Label3 = New Label()
+        Label4 = New Label()
         PictureBox2 = New PictureBox()
+        TextBoxOpposition = New TextBox()
         ContextMenuStrip1 = New ContextMenuStrip(components)
         CType(SplitContainer1, ComponentModel.ISupportInitialize).BeginInit()
         SplitContainer1.Panel1.SuspendLayout()
@@ -66,27 +68,30 @@ Partial Class Form1
         ' 
         ' Bt_Open
         ' 
-        Bt_Open.Location = New Point(119, 28)
+        Bt_Open.Location = New Point(104, 21)
+        Bt_Open.Margin = New Padding(3, 2, 3, 2)
         Bt_Open.Name = "Bt_Open"
-        Bt_Open.Size = New Size(94, 29)
+        Bt_Open.Size = New Size(82, 22)
         Bt_Open.TabIndex = 0
         Bt_Open.Text = "Ouvrir"
         Bt_Open.UseVisualStyleBackColor = True
         ' 
         ' Bt_Save
         ' 
-        Bt_Save.Location = New Point(219, 28)
+        Bt_Save.Location = New Point(192, 21)
+        Bt_Save.Margin = New Padding(3, 2, 3, 2)
         Bt_Save.Name = "Bt_Save"
-        Bt_Save.Size = New Size(94, 29)
+        Bt_Save.Size = New Size(82, 22)
         Bt_Save.TabIndex = 1
         Bt_Save.Text = "Enregistrer"
         Bt_Save.UseVisualStyleBackColor = True
         ' 
         ' Bt_Save_As
         ' 
-        Bt_Save_As.Location = New Point(319, 28)
+        Bt_Save_As.Location = New Point(279, 21)
+        Bt_Save_As.Margin = New Padding(3, 2, 3, 2)
         Bt_Save_As.Name = "Bt_Save_As"
-        Bt_Save_As.Size = New Size(124, 29)
+        Bt_Save_As.Size = New Size(108, 22)
         Bt_Save_As.TabIndex = 2
         Bt_Save_As.Text = "Enregistrer Sous"
         Bt_Save_As.UseVisualStyleBackColor = True
@@ -94,26 +99,28 @@ Partial Class Form1
         ' Title_Box
         ' 
         Title_Box.Anchor = AnchorStyles.Top Or AnchorStyles.Left Or AnchorStyles.Right
-        Title_Box.Location = New Point(27, 91)
+        Title_Box.Location = New Point(24, 68)
+        Title_Box.Margin = New Padding(3, 2, 3, 2)
         Title_Box.Name = "Title_Box"
-        Title_Box.Size = New Size(416, 27)
+        Title_Box.Size = New Size(250, 23)
         Title_Box.TabIndex = 3
         ' 
         ' Label_Titre
         ' 
         Label_Titre.AutoSize = True
-        Label_Titre.Location = New Point(27, 68)
+        Label_Titre.Location = New Point(24, 51)
         Label_Titre.Name = "Label_Titre"
-        Label_Titre.Size = New Size(39, 20)
+        Label_Titre.Size = New Size(31, 15)
         Label_Titre.TabIndex = 4
         Label_Titre.Text = "Titre"
         ' 
         ' Rich_Intrigue
         ' 
         Rich_Intrigue.Anchor = AnchorStyles.Top Or AnchorStyles.Bottom Or AnchorStyles.Left Or AnchorStyles.Right
-        Rich_Intrigue.Location = New Point(3, 23)
+        Rich_Intrigue.Location = New Point(3, 17)
+        Rich_Intrigue.Margin = New Padding(3, 2, 3, 2)
         Rich_Intrigue.Name = "Rich_Intrigue"
-        Rich_Intrigue.Size = New Size(512, 162)
+        Rich_Intrigue.Size = New Size(447, 122)
         Rich_Intrigue.TabIndex = 5
         Rich_Intrigue.Text = ""
         ' 
@@ -122,42 +129,44 @@ Partial Class Form1
         Label_Intrigue.AutoSize = True
         Label_Intrigue.Location = New Point(3, 0)
         Label_Intrigue.Name = "Label_Intrigue"
-        Label_Intrigue.Size = New Size(60, 20)
+        Label_Intrigue.Size = New Size(48, 15)
         Label_Intrigue.TabIndex = 6
         Label_Intrigue.Text = "Intrigue"
         ' 
         ' Label1
         ' 
         Label1.AutoSize = True
-        Label1.Location = New Point(29, 24)
+        Label1.Location = New Point(25, 18)
         Label1.Name = "Label1"
-        Label1.Size = New Size(95, 20)
+        Label1.Size = New Size(76, 15)
         Label1.TabIndex = 8
         Label1.Text = "Chorégraphe"
         ' 
         ' Label_Assistant
         ' 
         Label_Assistant.AutoSize = True
-        Label_Assistant.Location = New Point(24, 19)
+        Label_Assistant.Location = New Point(21, 14)
         Label_Assistant.Name = "Label_Assistant"
-        Label_Assistant.Size = New Size(120, 20)
+        Label_Assistant.Size = New Size(96, 15)
         Label_Assistant.TabIndex = 10
         Label_Assistant.Text = "Assistant Plateau"
         ' 
         ' Bt_Edit_choregraphe
         ' 
-        Bt_Edit_choregraphe.Location = New Point(130, 20)
+        Bt_Edit_choregraphe.Location = New Point(114, 15)
+        Bt_Edit_choregraphe.Margin = New Padding(3, 2, 3, 2)
         Bt_Edit_choregraphe.Name = "Bt_Edit_choregraphe"
-        Bt_Edit_choregraphe.Size = New Size(194, 29)
+        Bt_Edit_choregraphe.Size = New Size(170, 22)
         Bt_Edit_choregraphe.TabIndex = 11
         Bt_Edit_choregraphe.Text = "Editer Chorégraphe"
         Bt_Edit_choregraphe.UseVisualStyleBackColor = True
         ' 
         ' Bt_Edit_assistant
         ' 
-        Bt_Edit_assistant.Location = New Point(160, 15)
+        Bt_Edit_assistant.Location = New Point(140, 11)
+        Bt_Edit_assistant.Margin = New Padding(3, 2, 3, 2)
         Bt_Edit_assistant.Name = "Bt_Edit_assistant"
-        Bt_Edit_assistant.Size = New Size(140, 29)
+        Bt_Edit_assistant.Size = New Size(122, 22)
         Bt_Edit_assistant.TabIndex = 12
         Bt_Edit_assistant.Text = "Editer Assistant"
         Bt_Edit_assistant.UseVisualStyleBackColor = True
@@ -165,7 +174,8 @@ Partial Class Form1
         ' SplitContainer1
         ' 
         SplitContainer1.Dock = DockStyle.Bottom
-        SplitContainer1.Location = New Point(0, 476)
+        SplitContainer1.Location = New Point(0, 356)
+        SplitContainer1.Margin = New Padding(3, 2, 3, 2)
         SplitContainer1.Name = "SplitContainer1"
         ' 
         ' SplitContainer1.Panel1
@@ -179,32 +189,35 @@ Partial Class Form1
         SplitContainer1.Panel2.Controls.Add(lstAssistantsDisplay)
         SplitContainer1.Panel2.Controls.Add(Bt_Edit_assistant)
         SplitContainer1.Panel2.Controls.Add(Label_Assistant)
-        SplitContainer1.Size = New Size(800, 194)
-        SplitContainer1.SplitterDistance = 411
+        SplitContainer1.Size = New Size(700, 146)
+        SplitContainer1.SplitterDistance = 359
         SplitContainer1.TabIndex = 13
         ' 
         ' lstCombattants
         ' 
         lstCombattants.FormattingEnabled = True
-        lstCombattants.Location = New Point(29, 69)
+        lstCombattants.Location = New Point(25, 52)
+        lstCombattants.Margin = New Padding(3, 2, 3, 2)
         lstCombattants.Name = "lstCombattants"
-        lstCombattants.Size = New Size(295, 104)
+        lstCombattants.Size = New Size(259, 79)
         lstCombattants.TabIndex = 14
         ' 
         ' lstAssistantsDisplay
         ' 
         lstAssistantsDisplay.FormattingEnabled = True
-        lstAssistantsDisplay.Location = New Point(24, 69)
+        lstAssistantsDisplay.Location = New Point(21, 52)
+        lstAssistantsDisplay.Margin = New Padding(3, 2, 3, 2)
         lstAssistantsDisplay.Name = "lstAssistantsDisplay"
-        lstAssistantsDisplay.Size = New Size(295, 104)
+        lstAssistantsDisplay.Size = New Size(259, 79)
         lstAssistantsDisplay.TabIndex = 13
         ' 
         ' Bt_Editer_Chore
         ' 
         Bt_Editer_Chore.Anchor = AnchorStyles.Top Or AnchorStyles.Right
-        Bt_Editer_Chore.Location = New Point(626, 89)
+        Bt_Editer_Chore.Location = New Point(548, 67)
+        Bt_Editer_Chore.Margin = New Padding(3, 2, 3, 2)
         Bt_Editer_Chore.Name = "Bt_Editer_Chore"
-        Bt_Editer_Chore.Size = New Size(162, 29)
+        Bt_Editer_Chore.Size = New Size(142, 22)
         Bt_Editer_Chore.TabIndex = 14
         Bt_Editer_Chore.Text = "Editer Chorégraphie"
         Bt_Editer_Chore.UseVisualStyleBackColor = True
@@ -212,35 +225,38 @@ Partial Class Form1
         ' TextBox1
         ' 
         TextBox1.Anchor = AnchorStyles.Top Or AnchorStyles.Right
-        TextBox1.Location = New Point(474, 91)
+        TextBox1.Location = New Point(280, 66)
+        TextBox1.Margin = New Padding(3, 2, 3, 2)
         TextBox1.Name = "TextBox1"
-        TextBox1.Size = New Size(146, 27)
+        TextBox1.Size = New Size(128, 23)
         TextBox1.TabIndex = 15
         ' 
         ' Label2
         ' 
         Label2.Anchor = AnchorStyles.Top Or AnchorStyles.Right
         Label2.AutoSize = True
-        Label2.Location = New Point(474, 68)
+        Label2.Location = New Point(280, 49)
         Label2.Name = "Label2"
-        Label2.Size = New Size(49, 20)
+        Label2.Size = New Size(38, 15)
         Label2.TabIndex = 16
         Label2.Text = "Durée"
         ' 
         ' Bt_New
         ' 
-        Bt_New.Location = New Point(27, 28)
+        Bt_New.Location = New Point(24, 21)
+        Bt_New.Margin = New Padding(3, 2, 3, 2)
         Bt_New.Name = "Bt_New"
-        Bt_New.Size = New Size(86, 29)
+        Bt_New.Size = New Size(75, 22)
         Bt_New.TabIndex = 17
         Bt_New.Text = "Nouveau"
         Bt_New.UseVisualStyleBackColor = True
         ' 
         ' btnGeneratePdf
         ' 
-        btnGeneratePdf.Location = New Point(163, 22)
+        btnGeneratePdf.Location = New Point(143, 16)
+        btnGeneratePdf.Margin = New Padding(3, 2, 3, 2)
         btnGeneratePdf.Name = "btnGeneratePdf"
-        btnGeneratePdf.Size = New Size(146, 29)
+        btnGeneratePdf.Size = New Size(128, 22)
         btnGeneratePdf.TabIndex = 18
         btnGeneratePdf.Text = "Générer PDF"
         btnGeneratePdf.UseVisualStyleBackColor = True
@@ -250,18 +266,21 @@ Partial Class Form1
         cboPageSize.DropDownStyle = ComboBoxStyle.DropDownList
         cboPageSize.FormattingEnabled = True
         cboPageSize.Items.AddRange(New Object() {"A4 Paysage", "A4 Portrait", "A3 Paysage", "A3 Portrait"})
-        cboPageSize.Location = New Point(6, 22)
+        cboPageSize.Location = New Point(5, 16)
+        cboPageSize.Margin = New Padding(3, 2, 3, 2)
         cboPageSize.Name = "cboPageSize"
-        cboPageSize.Size = New Size(151, 28)
+        cboPageSize.Size = New Size(133, 23)
         cboPageSize.TabIndex = 19
         ' 
         ' GroupBox1
         ' 
         GroupBox1.Controls.Add(btnGeneratePdf)
         GroupBox1.Controls.Add(cboPageSize)
-        GroupBox1.Location = New Point(469, 8)
+        GroupBox1.Location = New Point(410, 6)
+        GroupBox1.Margin = New Padding(3, 2, 3, 2)
         GroupBox1.Name = "GroupBox1"
-        GroupBox1.Size = New Size(319, 57)
+        GroupBox1.Padding = New Padding(3, 2, 3, 2)
+        GroupBox1.Size = New Size(279, 43)
         GroupBox1.TabIndex = 20
         GroupBox1.TabStop = False
         GroupBox1.Text = "Génération PDF"
@@ -269,7 +288,8 @@ Partial Class Form1
         ' SplitContainer2
         ' 
         SplitContainer2.Anchor = AnchorStyles.Top Or AnchorStyles.Bottom Or AnchorStyles.Left Or AnchorStyles.Right
-        SplitContainer2.Location = New Point(27, 124)
+        SplitContainer2.Location = New Point(24, 93)
+        SplitContainer2.Margin = New Padding(3, 2, 3, 2)
         SplitContainer2.Name = "SplitContainer2"
         ' 
         ' SplitContainer2.Panel1
@@ -284,17 +304,17 @@ Partial Class Form1
         ' SplitContainer2.Panel2
         ' 
         SplitContainer2.Panel2.Controls.Add(PictureBox2)
-        SplitContainer2.Size = New Size(761, 346)
-        SplitContainer2.SplitterDistance = 531
+        SplitContainer2.Size = New Size(666, 260)
+        SplitContainer2.SplitterDistance = 464
         SplitContainer2.TabIndex = 22
         ' 
         ' lblCategorie
         ' 
         lblCategorie.Anchor = AnchorStyles.Bottom Or AnchorStyles.Left Or AnchorStyles.Right
         lblCategorie.AutoSize = True
-        lblCategorie.Location = New Point(6, 286)
+        lblCategorie.Location = New Point(5, 214)
         lblCategorie.Name = "lblCategorie"
-        lblCategorie.Size = New Size(33, 20)
+        lblCategorie.Size = New Size(27, 15)
         lblCategorie.TabIndex = 10
         lblCategorie.Text = "----"
         ' 
@@ -302,9 +322,10 @@ Partial Class Form1
         ' 
         chkMouvementEnsemble.Anchor = AnchorStyles.Bottom Or AnchorStyles.Left Or AnchorStyles.Right
         chkMouvementEnsemble.AutoSize = True
-        chkMouvementEnsemble.Location = New Point(292, 286)
+        chkMouvementEnsemble.Location = New Point(256, 213)
+        chkMouvementEnsemble.Margin = New Padding(3, 2, 3, 2)
         chkMouvementEnsemble.Name = "chkMouvementEnsemble"
-        chkMouvementEnsemble.Size = New Size(190, 24)
+        chkMouvementEnsemble.Size = New Size(155, 19)
         chkMouvementEnsemble.TabIndex = 9
         chkMouvementEnsemble.Text = "Mouvement d'ensemble"
         chkMouvementEnsemble.UseVisualStyleBackColor = True
@@ -312,30 +333,51 @@ Partial Class Form1
         ' txtNomClub
         ' 
         txtNomClub.Anchor = AnchorStyles.Bottom Or AnchorStyles.Left
-        txtNomClub.Location = New Point(3, 230)
+        txtNomClub.Location = New Point(3, 172)
+        txtNomClub.Margin = New Padding(3, 2, 3, 2)
         txtNomClub.Name = "txtNomClub"
-        txtNomClub.Size = New Size(512, 27)
+        txtNomClub.Size = New Size(448, 23)
         txtNomClub.TabIndex = 8
         ' 
         ' Label3
         ' 
         Label3.Anchor = AnchorStyles.Bottom Or AnchorStyles.Left
         Label3.AutoSize = True
-        Label3.Location = New Point(3, 207)
+        Label3.Location = New Point(3, 155)
         Label3.Name = "Label3"
-        Label3.Size = New Size(95, 20)
+        Label3.Size = New Size(77, 15)
         Label3.TabIndex = 7
         Label3.Text = "Nom du club"
+        ' 
+        ' Label4
+        ' 
+        Label4.Anchor = AnchorStyles.Top Or AnchorStyles.Right
+        Label4.AutoSize = True
+        Label4.Location = New Point(415, 50)
+        Label4.Name = "Label4"
+        Label4.Size = New Size(108, 15)
+        Label4.TabIndex = 24
+        Label4.Text = "Durée d'opposition"
         ' 
         ' PictureBox2
         ' 
         PictureBox2.Image = My.Resources.Resources.Judith
-        PictureBox2.Location = New Point(0, 3)
+        PictureBox2.Location = New Point(0, 2)
+        PictureBox2.Margin = New Padding(3, 2, 3, 2)
         PictureBox2.Name = "PictureBox2"
-        PictureBox2.Size = New Size(226, 200)
+        PictureBox2.Size = New Size(198, 150)
         PictureBox2.SizeMode = PictureBoxSizeMode.StretchImage
         PictureBox2.TabIndex = 0
         PictureBox2.TabStop = False
+        ' 
+        ' TextBoxOpposition
+        ' 
+        TextBoxOpposition.Anchor = AnchorStyles.Top Or AnchorStyles.Right
+        TextBoxOpposition.Location = New Point(415, 67)
+        TextBoxOpposition.Margin = New Padding(3, 2, 3, 2)
+        TextBoxOpposition.Name = "TextBoxOpposition"
+        TextBoxOpposition.Size = New Size(128, 23)
+        TextBoxOpposition.TabIndex = 23
         ' 
         ' ContextMenuStrip1
         ' 
@@ -345,10 +387,12 @@ Partial Class Form1
         ' 
         ' Form1
         ' 
-        AutoScaleDimensions = New SizeF(8.0F, 20.0F)
+        AutoScaleDimensions = New SizeF(7F, 15F)
         AutoScaleMode = AutoScaleMode.Font
-        ClientSize = New Size(800, 670)
+        ClientSize = New Size(700, 502)
+        Controls.Add(Label4)
         Controls.Add(SplitContainer2)
+        Controls.Add(TextBoxOpposition)
         Controls.Add(GroupBox1)
         Controls.Add(Bt_New)
         Controls.Add(Label2)
@@ -361,6 +405,7 @@ Partial Class Form1
         Controls.Add(Bt_Save)
         Controls.Add(Bt_Open)
         Icon = CType(resources.GetObject("$this.Icon"), Icon)
+        Margin = New Padding(3, 2, 3, 2)
         Name = "Form1"
         Text = "Editeur Chorégraphique"
         SplitContainer1.Panel1.ResumeLayout(False)
@@ -411,5 +456,7 @@ Partial Class Form1
     Friend WithEvents Label3 As Label
     Friend WithEvents chkMouvementEnsemble As CheckBox
     Friend WithEvents lblCategorie As Label
+    Friend WithEvents Label4 As Label
+    Friend WithEvents TextBoxOpposition As TextBox
 
 End Class

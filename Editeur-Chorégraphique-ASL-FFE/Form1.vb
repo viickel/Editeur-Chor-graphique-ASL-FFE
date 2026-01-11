@@ -208,6 +208,8 @@ Public Class Form1
         ' Section "Durée" (TextBox1 est le nom du contrôle pour la durée)
         TextBox1.Text = currentProjet.Duree
 
+        TextBoxOpposition.Text = currentProjet.DureeOposition
+
         'section Nom du club
         txtNomClub.Text = currentProjet.NomDuClub
 
@@ -232,6 +234,7 @@ Public Class Form1
         currentProjet.Titre = Title_Box.Text
         currentProjet.Intrigue = Rich_Intrigue.Text
         currentProjet.Duree = TextBox1.Text
+        currentProjet.DureeOposition = TextBoxOpposition.Text
         currentProjet.NomDuClub = txtNomClub.Text
         currentProjet.IsMouvementEnsemble = chkMouvementEnsemble.Checked
         ' Appel de la méthode pour déterminer et stocker la catégorie
@@ -303,6 +306,13 @@ Public Class Form1
     Private Sub TextBox1_TextChanged(sender As Object, e As EventArgs) Handles TextBox1.TextChanged
         MarkAsDirty()
     End Sub
+
+
+    ' Marquer le projet comme modifié lorsque la durée change
+    Private Sub Opposition_TextChanged(sender As Object, e As EventArgs) Handles TextBoxOpposition.TextChanged
+        MarkAsDirty()
+    End Sub
+
 
     'marquer le projet comme modifié lorsque le nom du club change
     Private Sub txtNomClub_TextChanged(sender As Object, e As EventArgs) Handles txtNomClub.TextChanged
@@ -483,6 +493,10 @@ Public Class Form1
                     doc.Add(New Paragraph(tempsFormatted, fontSubtitle))
                 End If
 
+                If Not String.IsNullOrEmpty(currentProjet.DureeOposition) Then
+                    doc.Add(New Paragraph("Durée d'opposition : " & currentProjet.DureeOposition, fontSubtitle))
+                End If
+
                 If Not String.IsNullOrEmpty(currentProjet.NomDuClub) Then
                     doc.Add(New Paragraph("Nom du Club : " & currentProjet.NomDuClub, fontSubtitle))
                 End If
@@ -500,7 +514,7 @@ Public Class Form1
 
                 ' En-têtes du tableau
                 tableParticipants.AddCell(New PdfPCell(New Phrase("Combattant", fontNormal)))
-                tableParticipants.AddCell(New PdfPCell(New Phrase("Assistant", fontNormal)))
+                tableParticipants.AddCell(New PdfPCell(New Phrase("Assistant / Figurant", fontNormal)))
 
                 ' Contenu du tableau
                 Dim maxParticipants As Integer = Math.Max(currentProjet.ListeCombattants.Count, currentProjet.ListeAssistants.Count)
@@ -526,7 +540,7 @@ Public Class Form1
                     Dim assistantCell As New PdfPCell()
                     If i < currentProjet.ListeAssistants.Count Then
                         Dim a As Assistant = currentProjet.ListeAssistants(i)
-                        assistantCell.AddElement(New Phrase($"{a.Nom} {a.Prenom} (Licence: {a.NumeroLicence})", fontNormal))
+                        assistantCell.AddElement(New Phrase($"{a.Nom} {a.Prenom} (Licence: {a.NumeroLicence}) Rôle : {a.Role}", fontNormal))
                     Else
                         assistantCell.AddElement(New Phrase("")) ' Cellule vide si pas d'assistant
                     End If
@@ -686,6 +700,8 @@ Public Class Form1
     Private Sub chkMouvementEnsemble_CheckedChanged(sender As Object, e As EventArgs) Handles chkMouvementEnsemble.CheckedChanged
         DetermineAndSetCategorie() ' Recalcule la catégorie
     End Sub
+
+
 End Class
 
 
