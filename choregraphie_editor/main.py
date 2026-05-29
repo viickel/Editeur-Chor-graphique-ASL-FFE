@@ -33,87 +33,86 @@ def main():
 
     # Feuille de style globale pour améliorer l'apparence
     app.setStyleSheet("""
-        QMainWindow {
-            background-color: #f5f5f5;
+        /* Fond global très sombre (gris sidéral) */
+        QMainWindow, QDialog {
+            background-color: #121212;
+            color: #e0e0e0;
         }
+
+        /* Groupes stylés avec bordure fine et discrète */
         QGroupBox {
             font-weight: bold;
-            border: 1px solid #cccccc;
-            border-radius: 5px;
-            margin-top: 10px;
+            border: 1px solid #333333;
+            border-radius: 6px;
+            margin-top: 14px;
             padding-top: 10px;
+            color: #ffffff;
         }
         QGroupBox::title {
             subcontrol-origin: margin;
             left: 10px;
-            padding: 0 3px 0 3px;
+            padding: 0 5px;
+            color: #4a90d9;
         }
+
+        /* Boutons avec une touche de profondeur */
         QPushButton {
-            background-color: #4a90d9;
-            color: white;
-            border: none;
+            background-color: #1e1e1e;
+            color: #e0e0e0;
+            border: 1px solid #4a90d9;
             border-radius: 4px;
             padding: 6px 14px;
             font-size: 12px;
         }
         QPushButton:hover {
-            background-color: #357abd;
+            background-color: #2a2a2a;
+            border-color: #6fb3ff;
+            color: #ffffff;
         }
-        QPushButton:pressed {
-            background-color: #2a6099;
+        
+        /* Boutons spéciaux type "Laser" */
+        QPushButton[success="true"] { background-color: #004d40; border-color: #00e676; color: white; }
+        QPushButton[danger="true"] { background-color: #4a1414; border-color: #ff5252; color: white; }
+        QPushButton[secondary="true"] { background-color: #263238; border-color: #78909c; color: white; }
+
+        /* Saisie de texte */
+        QLineEdit, QTextEdit, QComboBox {
+            background-color: #0a0a0a;
+            border: 1px solid #333333;
+            color: #ffffff;
+            padding: 4px;
+            border-radius: 3px;
         }
-        QPushButton:disabled {
-            background-color: #aaaaaa;
-            color: #dddddd;
+
+        /* Tableaux et Listes */
+        QTableWidget, QListWidget {
+            background-color: #121212;
+            alternate-background-color: #1a1a1a;
+            border: 1px solid #333333;
+            gridline-color: #333333;
         }
-        QPushButton[danger="true"] {
-            background-color: #d9534f;
-        }
-        QPushButton[danger="true"]:hover {
-            background-color: #c9302c;
-        }
-        QPushButton[secondary="true"] {
-            background-color: #6c757d;
-        }
-        QPushButton[secondary="true"]:hover {
-            background-color: #545b62;
-        }
-        QPushButton[success="true"] {
-            background-color: #5cb85c;
-        }
-        QPushButton[success="true"]:hover {
-            background-color: #449d44;
-        }
-        QTableWidget {
-            gridline-color: #dddddd;
-            alternate-background-color: #f9f9f9;
-        }
-        QTableWidget::item:selected {
-            background-color: #4a90d9;
+        QTableWidget::item:selected, QListWidget::item:selected {
+            background-color: #005f87;
             color: white;
         }
         QHeaderView::section {
-            background-color: #e8e8e8;
+            background-color: #1e1e1e;
+            color: #aaaaaa;
             padding: 4px;
-            border: 1px solid #dddddd;
-            font-weight: bold;
+            border: 1px solid #333333;
         }
-        QListWidget::item:selected {
-            background-color: #4a90d9;
-            color: white;
-        }
-        QTabWidget::pane {
-            border: 1px solid #cccccc;
-        }
+
+        /* Tabs */
         QTabBar::tab {
-            background-color: #e8e8e8;
+            background-color: #1e1e1e;
+            color: #888888;
             padding: 6px 14px;
-            border: 1px solid #cccccc;
-            border-bottom: none;
+            border: 1px solid #333333;
         }
         QTabBar::tab:selected {
-            background-color: white;
-            font-weight: bold;
+            background-color: #121212;
+            color: #4a90d9;
+            border-bottom: none;
         }
     """)
 

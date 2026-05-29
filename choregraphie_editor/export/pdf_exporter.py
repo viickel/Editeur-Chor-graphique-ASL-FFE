@@ -34,15 +34,15 @@ from models.combattant import Combattant
 
 
 # ---------------------------------------------------------------------------
-# Palette de couleurs (cohérente avec l'interface graphique)
+# Palette de couleurs 
 # ---------------------------------------------------------------------------
-COULEUR_TITRE       = colors.HexColor("#2c3e50")   # Bleu-gris foncé
-COULEUR_EN_TETE     = colors.HexColor("#4a90d9")   # Bleu principal
+COULEUR_TITRE       = colors.HexColor("#1a1a1a")   # Presque noir pour le texte
+COULEUR_EN_TETE     = colors.HexColor("#4a90d9")   # Bleu Laser
 COULEUR_EN_TETE_TXT = colors.white
-COULEUR_LIGNE_PAIRE = colors.HexColor("#f0f6ff")   # Bleu très clair
+COULEUR_LIGNE_PAIRE = colors.HexColor("#f8f9fa")   # Très léger gris
 COULEUR_LIGNE_IMPR  = colors.white
-COULEUR_BORD        = colors.HexColor("#b0c4de")   # Gris-bleu clair
-COULEUR_SOUS_TITRE  = colors.HexColor("#5a6a7a")   # Gris-bleu
+COULEUR_BORD        = colors.HexColor("#4a90d9")   # Bordures bleues type "lame"
+COULEUR_SOUS_TITRE  = colors.HexColor("#5a6a7a")
 COULEUR_SEPARATEUR  = colors.HexColor("#4a90d9")
 
 
@@ -216,10 +216,6 @@ class PdfExporter:
 
         return story
 
-    # =========================================================================
-    # SECTION PHRASE D'ARMES
-    # =========================================================================
-
     @classmethod
     def _build_phrase_section(
         cls,
@@ -228,152 +224,82 @@ class PdfExporter:
         styles,
         page_size,
     ) -> list:
-        """Construit la section PDF d'une phrase d'armes (tableau des actions)."""
         story = []
-        combattants = projet.liste_combattants
-        show_cible = len(combattants) > 2
-
-        # En-tête de la phrase
-        story.append(Paragraph(
-            f"Phrase {phrase.numero}",
-            styles["titre_phrase"]
-        ))
-        if phrase.description_section:
-            story.append(Paragraph(
-                phrase.description_section.replace("\n", "<br/>"),
-                styles["description_phrase"]
-            ))
+        
+        # Titre de la phrase
+        story.append(Paragraph(f"Phrase {phrase.numero} : {phrase.description_section}", styles["titre_phrase"]))
         story.append(Spacer(1, 0.3 * cm))
 
         if not phrase.liste_actions:
-            story.append(Paragraph("(Aucune action dans cette phrase)", styles["corps"]))
+            story.append(Paragraph("Aucune action définie pour cette phrase.", styles["corps"]))
             return story
 
-        # Construire les en-têtes du tableau des actions
-        # Ligne 1 : "Action" + nom de chaque combattant sur plusieurs colonnes
-        # Ligne 2 : numéros + champs détaillés
-        header_row1 = [""]  # Colonne "N°"
-        header_row2 = ["N°"]
+        # --- PAGINATION HORIZONTALE ---
+        # On découpe les actions par blocs pour éviter le débordement
+        ordered_actions = sorted(phrase.liste_actions, key=lambda a: a.numero_action)
+        SEUIL_ACTIONS = 8  # Nombre d'actions par bloc horizontal
+        
+        for i in range(0, len(ordered_actions), SEUIL_ACTIONS):
+            segment = ordered_actions[i : i + SEUIL_ACTIONS]
+            
+            # Construction de l'en-tête du segment
+            header_row = ["N° Action"] + [str(a.numero_action) for a in segment]
+            table_data = [header_row]
 
-        # Calculer le nombre de colonnes par combattant
-        cols_par_combattant = 7 if show_cible else 5  # avec ou sans cibles
+            # Propriétés à afficher
+            mvt_props = [
+                ("Main D", "main_droite"), ("Zone MD", "zone_main_droite"), ("Cible MD", "cible_main_droite_id"),
+                ("Main G", "main_gauche"), ("Zone MG", "zone_main_gauche"), ("Cible MG", "cible_main_gauche_id"),
+                ("Dépl.", "deplacement"), ("Com.", "commentaire")
+            ]
 
-        for c in combattants:
-            header_row1 += [f"{c.prenom} {c.nom}"] + [""] * (cols_par_combattant - 1)
-            if show_cible:
-                header_row2 += [
-                    "Main D", "Zone MD", "Cible MD",
-                    "Main G", "Zone MG", "Cible MG",
-                    "Déplacement",
-                ]
-            else:
-                header_row2 += [
-                    "Main D", "Zone MD",
-                    "Main G", "Zone MG",
-                    "Déplacement",
-                ]
+            for combatant in sorted(projet.liste_combattants, key=lambda c: c.id):
+                # Ligne nom combattant
+                combatant_row = [f"{combatant.nom} {combatant.prenom} (ID: {combatant.id})"] + [""] * len(segment)
+                table_data.append(combatant_row)
 
-        # Colonnes commentaires (une par combattant)
-        for _ in combattants:
-            header_row1.append("Commentaire")
-            header_row2.append("")
+                # Lignes de données
+                for label, attr in mvt_props:
+                    row = [label]
+                    has_data = False
+                    for action in segment:
+                        mvt = action.get_mouvement_pour_combattant(combatant.id)
+                        val = str(getattr(mvt, attr, "")) if mvt else ""
+                        if val in ["0", "None"]: val = ""
+                        
+                        # Utilisation de Paragraph pour gérer le retour à la ligne automatique
+                        row.append(Paragraph(val, styles["corps"]))
+                        if val.strip(): has_data = True
+                    
+                    if has_data:
+                        table_data.append(row)
 
-        # Construire les lignes de données
-        data_rows = []
-        for action in sorted(phrase.liste_actions, key=lambda a: a.numero_action):
-            row = [str(action.numero_action)]
+            # Calcul des largeurs (PageWidth - marges / nombre de colonnes)
+            available_width = page_size[0] - 3 * cm
+            col_widths = [2.5 * cm] + [(available_width - 2.5 * cm) / len(segment)] * len(segment)
 
-            for c in combattants:
-                m = action.get_mouvement_pour_combattant(c.id)
-                if m:
-                    if show_cible:
-                        row += [
-                            m.main_droite,
-                            m.zone_main_droite,
-                            str(m.cible_main_droite_id) if m.cible_main_droite_id else "—",
-                            m.main_gauche,
-                            m.zone_main_gauche,
-                            str(m.cible_main_gauche_id) if m.cible_main_gauche_id else "—",
-                            m.deplacement,
-                        ]
-                    else:
-                        row += [
-                            m.main_droite,
-                            m.zone_main_droite,
-                            m.main_gauche,
-                            m.zone_main_gauche,
-                            m.deplacement,
-                        ]
-                else:
-                    row += [""] * cols_par_combattant
-
-            # Commentaires
-            for c in combattants:
-                m = action.get_mouvement_pour_combattant(c.id)
-                row.append(m.commentaire if m else "")
-
-            data_rows.append(row)
-
-        # Assembler toutes les lignes
-        all_data = [header_row1, header_row2] + data_rows
-
-        # Calculer les largeurs de colonnes dynamiquement
-        page_width = page_size[0]
-        usable_width = page_width - 3 * cm  # marges gauche + droite
-        nb_combattants = len(combattants)
-        total_cols = 1 + nb_combattants * (cols_par_combattant + 1)  # +1 pour commentaire
-
-        # Colonne N° : fixe, petite
-        col_num_w = 0.9 * cm
-        # Colonnes commentaire : légèrement plus larges
-        col_comment_w = 3.0 * cm
-        # Colonnes mouvements : répartition du reste
-        remaining = usable_width - col_num_w - (nb_combattants * col_comment_w)
-        col_mvt_w = max(remaining / (nb_combattants * cols_par_combattant), 1.5 * cm)
-
-        col_widths = [col_num_w]
-        for _ in combattants:
-            col_widths += [col_mvt_w] * cols_par_combattant
-        for _ in combattants:
-            col_widths.append(col_comment_w)
-
-        # Créer le tableau ReportLab
-        table = Table(all_data, colWidths=col_widths, repeatRows=2)
-
-        # Style de base
-        style = cls._table_style_base()
-
-        # Span de la ligne 1 pour regrouper les colonnes par combattant
-        col_start = 1
-        for ci in range(nb_combattants):
-            end = col_start + cols_par_combattant - 1
-            style.add("SPAN", (col_start, 0), (end, 0))
-            style.add("ALIGN", (col_start, 0), (end, 0), "CENTER")
-            style.add("BACKGROUND", (col_start, 0), (end, 0), COULEUR_EN_TETE)
-            style.add("TEXTCOLOR", (col_start, 0), (end, 0), COULEUR_EN_TETE_TXT)
-            col_start += cols_par_combattant
-
-        # Commentaires : colonnes regroupées ligne 1
-        for ci in range(nb_combattants):
-            style.add("BACKGROUND", (col_start + ci, 0), (col_start + ci, 0), COULEUR_SOUS_TITRE)
-            style.add("TEXTCOLOR", (col_start + ci, 0), (col_start + ci, 0), colors.white)
-
-        # Colonne N°
-        style.add("SPAN", (0, 0), (0, 1))
-        style.add("VALIGN", (0, 0), (0, 1), "MIDDLE")
-        style.add("BACKGROUND", (0, 0), (0, 1), COULEUR_SOUS_TITRE)
-        style.add("TEXTCOLOR", (0, 0), (0, 1), colors.white)
-
-        # Ligne d'en-tête 2
-        style.add("BACKGROUND", (1, 1), (-1, 1), COULEUR_SOUS_TITRE)
-        style.add("TEXTCOLOR", (1, 1), (-1, 1), colors.white)
-        style.add("FONTSIZE", (0, 0), (-1, 1), 7)
-        style.add("FONTNAME", (0, 0), (-1, 1), "Helvetica-Bold")
-
-        table.setStyle(style)
-        story.append(table)
+            table = Table(table_data, colWidths=col_widths, repeatRows=1)
+            
+            # Style appliqué au segment
+            table.setStyle(TableStyle([
+                ("BACKGROUND", (0, 0), (-1, 0), COULEUR_EN_TETE),
+                ("TEXTCOLOR", (0, 0), (-1, 0), colors.white),
+                ("FONTNAME", (0, 0), (-1, 0), "Helvetica-Bold"),
+                ("GRID", (0, 0), (-1, -1), 0.5, COULEUR_BORD),
+                ("BACKGROUND", (0, 1), (-1, 1), colors.whitesmoke), # Ligne combattant
+                ("FONTSIZE", (0, 0), (-1, -1), 7),
+                ("VALIGN", (0, 0), (-1, -1), "MIDDLE"),
+            ]))
+            
+            story.append(table)
+            story.append(Spacer(1, 0.5 * cm))
+            
+            # Si on a encore des actions, on force un saut de page pour le bloc suivant
+            if i + SEUIL_ACTIONS < len(ordered_actions):
+                story.append(PageBreak())
 
         return story
+    
 
     # =========================================================================
     # STYLES COMMUNS
