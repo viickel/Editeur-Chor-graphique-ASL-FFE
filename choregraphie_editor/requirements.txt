@@ -1,0 +1,15 @@
+# ============================================================
+# Éditeur Chorégraphique ASL-FFE — V2
+# Dépendances Python
+#
+# Installation :
+#   pip install -r requirements.txt
+#
+# Compatibilité : Python 3.10+  |  Windows · macOS · Linux
+# ============================================================
+
+# Interface graphique multiplateforme (équivalent WinForms)
+PyQt6>=6.5.0
+
+# Génération de PDF (équivalent iTextSharp)
+reportlab>=4.0.0
