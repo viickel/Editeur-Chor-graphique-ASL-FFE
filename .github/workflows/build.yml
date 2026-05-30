@@ -27,14 +27,14 @@ jobs:
       - name: Build with PyInstaller
         run: |
           cd choregraphie_editor
-          # On utilise --onedir pour créer un dossier au lieu d'un seul fichier
+          # On génère le dossier avec --onedir
           pyinstaller --noconfirm --onedir --windowed --name "EditeurChore" main.py
           
-          # On copie les fichiers de config dans le dossier créé par PyInstaller
-          # Le dossier généré s'appelle 'dist/EditeurChore'
-          cp OptionsMouvements.csv dist/EditeurChore/
-          cp dark.qss dist/EditeurChore/
-          cp light.qss dist/EditeurChore/
+          # Copie des fichiers dans le dossier '_internal'
+          # PyInstaller place les bibliothèques ici, c'est l'endroit idéal pour tes assets
+          cp OptionsMouvements.csv dist/EditeurChore/_internal/
+          cp dark.qss dist/EditeurChore/_internal/
+          cp light.qss dist/EditeurChore/_internal/
 
       - name: Upload Artifacts
         uses: actions/upload-artifact@v4
