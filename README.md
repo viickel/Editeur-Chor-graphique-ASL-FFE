@@ -1,47 +1,52 @@
-# Éditeur de Projet Chorégraphique ASL-FFE 🕺⚔️
+# Éditeur de Projet Chorégraphique V2.0 🕺⚔️
 
-Bienvenue sur le dépôt officiel de l'**Éditeur de Projet Chorégraphique**, un outil conçu pour structurer, personnaliser et exporter vos chorégraphies et enchaînements (adapté pour les normes ASL-FFE mais, grâce à la souplesse du CSV, il peut être adapté aussi à l'escrime artistique).
+Bienvenue sur le dépôt officiel de l'Éditeur de Projet Chorégraphique. Cet outil vous permet de structurer, personnaliser et exporter vos chorégraphies et enchaînements (conçu pour les normes ASL-FFE, il reste parfaitement adaptable à l'escrime artistique).
 
-⚠️ **Note importante :** Pour le moment, l'application fonctionne uniquement sous **Windows**. Une réécriture dans un langage permettant une utilisation multi-OS (cross-platform) est à l'étude. N'hésitez pas à donner un coup de main !
+Cette nouvelle version est entièrement réécrite en Python pour offrir une expérience fluide sur Windows, macOS et Linux.
+# 🚀 Quoi de neuf en V2.0 ?
 
----
+    Multi-OS : Fonctionne nativement sur Windows, macOS et Linux.
 
-## 🚀 Nouveautés de la version
+    Simplicité d'utilisation : Plus aucune installation requise. Téléchargez, décompressez et lancez le logiciel.
 
-- **Ajout de nouvelles catégories :** Prise en charge complète des catégories *Kata*, *Duel*, *Bataille* et *Ensemble*.
-- **Optimisation de l'export PDF :** Suppression des lignes inutiles dans la génération du PDF pour un rendu visuel plus propre et professionnel.
+    Personnalisation facilitée : Vos options sont désormais stockées dans un dossier externe, simple à modifier.
 
----
+    Rendu PDF optimisé : Génération de rapports encore plus propres et professionnels.
 
-## 🛠️ Installation et Prérequis
+# 📦 Installation et Lancement
 
-### 1. Prérequis .NET 9
-Pour utiliser le logiciel, vous devez obligatoirement télécharger et installer cette version de .NET 9 :
-👉 [Télécharger .NET 9](https://dotnet.microsoft.com/download/dotnet/9.0)
+Le logiciel est portable : il n'y a aucune installation système à effectuer.
 
-### 2. Téléchargement de l'application
-1. Téléchargez le fichier `Editeur Projet Chorégraphique.zip`.
-2. Décompressez l'archive dans le dossier de votre choix.
+    Téléchargement : Téléchargez la version correspondante à votre système (Windows, macOS ou Linux) depuis les Releases.
 
----
+    Décompression : Extrayez le contenu de l'archive .zip dans le dossier de votre choix.
 
-## ⚙️ Personnalisation des données (`OptionsMouvements.csv`)
+    Lancement :
 
-Dans le dossier décompressé, vous trouverez le fichier **`OptionsMouvements.csv`** qui contient les données des listes déroulantes de l'application. 
+        Windows : Double-cliquez sur EditeurChore.exe.
 
-- Vous pouvez modifier son contenu comme bon vous semble pour personnaliser vos textes et mouvements.
-- ⚠️ **ATTENTION :** Si vous modifiez le fichier CSV et qu'une autre personne doit éditer un fichier `.chore`, pensez à lui fournir également votre fichier CSV personnalisé pour garantir la cohérence des données.
+        macOS : Double-cliquez sur EditeurChore. (Si macOS bloque l'ouverture, faites un clic droit sur l'icône > Ouvrir).
 
----
+        Linux : Rendez le fichier exécutable (chmod +x EditeurChore) puis lancez-le depuis votre terminal ou votre gestionnaire de fichiers.
 
-## 💻 Utilisation du logiciel
+# ⚙️ Personnalisation (Vos Mouvements)
 
-1. Rendez-vous dans le dossier décompressé.
-2. Double-cliquez sur **`Editeur-Chorégraphique-ASL-FFE.exe`** pour lancer le logiciel.
+Vous souhaitez adapter les menus déroulants à vos besoins ? Rien de plus simple :
 
-### 🎥 Tutoriel Vidéo
+    Ouvrez le dossier de l'application.
+
+    Naviguez dans le dossier _internal.
+
+    Modifiez le fichier OptionsMouvements.csv avec votre tableur préféré (Excel, Numbers, LibreOffice).
+
+    Enregistrez et relancez le logiciel : vos nouvelles options sont immédiatement prises en compte.
+
+# ⚠️ Note : Si vous partagez vos fichiers .chore avec d'autres personnes, assurez-vous de leur transmettre également votre fichier CSV personnalisé pour que les données correspondent.
+
+# 🎥 Tutoriel Vidéo
+
 Pour vous guider pas à pas dans l'utilisation du logiciel, découvrez notre tutoriel vidéo complet :
 
-[![Tuto Utilisation Logiciel](https://img.shields.io/badge/YouTube-Regarder%20le%20Tuto-red?style=for-the-badge&logo=youtube)](https://www.youtube.com/watch?v=x2vQ4uefG68)
+TOURNAGE EN COURS
 
-🔗 [Cliquez ici pour visionner le tutoriel sur YouTube](https://www.youtube.com/watch?v=x2vQ4uefG68)
+Cette version 2.0 est nouvelle. Si vous utilisez macOS ou Linux, n'hésitez pas à me faire un retour sur le fonctionnement du logiciel via les Issues du dépôt GitHub. Toute aide pour améliorer le code est la bienvenue !
