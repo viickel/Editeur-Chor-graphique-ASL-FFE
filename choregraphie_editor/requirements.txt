@@ -13,3 +13,4 @@ PyQt6>=6.5.0
 
 # Génération de PDF (équivalent iTextSharp)
 reportlab>=4.0.0
+pyinstaller
