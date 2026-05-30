@@ -624,6 +624,7 @@ class MainWindow(QMainWindow):
             self,
             "À propos — Éditeur Chorégraphique ASL-FFE",
             "<h3>Éditeur Chorégraphique ASL-FFE</h3>"
+            "<p><b>Auteur : Vincent Thivolle de l'académie de la force de Metz</b></p>"
             "<p><b>Version 2.0</b> — Python / PyQt6</p>"
             "<p>Migration multiplateforme de l'éditeur VB.NET original.</p>"
             "<p>Compatible Windows, macOS et Linux.</p>"

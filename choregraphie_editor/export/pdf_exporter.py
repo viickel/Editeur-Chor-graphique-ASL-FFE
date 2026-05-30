@@ -226,7 +226,6 @@ class PdfExporter:
     ) -> list:
         story = []
         
-        # Titre de la phrase
         story.append(Paragraph(f"Phrase {phrase.numero} : {phrase.description_section}", styles["titre_phrase"]))
         story.append(Spacer(1, 0.3 * cm))
 
@@ -234,19 +233,25 @@ class PdfExporter:
             story.append(Paragraph("Aucune action définie pour cette phrase.", styles["corps"]))
             return story
 
-        # --- PAGINATION HORIZONTALE ---
-        # On découpe les actions par blocs pour éviter le débordement
         ordered_actions = sorted(phrase.liste_actions, key=lambda a: a.numero_action)
-        SEUIL_ACTIONS = 8  # Nombre d'actions par bloc horizontal
+        SEUIL_ACTIONS = 8
         
         for i in range(0, len(ordered_actions), SEUIL_ACTIONS):
             segment = ordered_actions[i : i + SEUIL_ACTIONS]
             
-            # Construction de l'en-tête du segment
             header_row = ["N° Action"] + [str(a.numero_action) for a in segment]
             table_data = [header_row]
+            
+            # Initialisation du style avec les règles de base
+            table_styles = [
+                ("BACKGROUND", (0, 0), (-1, 0), COULEUR_EN_TETE),
+                ("TEXTCOLOR", (0, 0), (-1, 0), colors.white),
+                ("FONTNAME", (0, 0), (-1, 0), "Helvetica-Bold"),
+                ("GRID", (0, 0), (-1, -1), 0.5, COULEUR_BORD),
+                ("FONTSIZE", (0, 0), (-1, -1), 7),
+                ("VALIGN", (0, 0), (-1, -1), "MIDDLE"),
+            ]
 
-            # Propriétés à afficher
             mvt_props = [
                 ("Main D", "main_droite"), ("Zone MD", "zone_main_droite"), ("Cible MD", "cible_main_droite_id"),
                 ("Main G", "main_gauche"), ("Zone MG", "zone_main_gauche"), ("Cible MG", "cible_main_gauche_id"),
@@ -254,11 +259,21 @@ class PdfExporter:
             ]
 
             for combatant in sorted(projet.liste_combattants, key=lambda c: c.id):
-                # Ligne nom combattant
+                # 1. Ajout ligne combattant (fusionnée)
                 combatant_row = [f"{combatant.nom} {combatant.prenom} (ID: {combatant.id})"] + [""] * len(segment)
                 table_data.append(combatant_row)
+                row_idx = len(table_data) - 1
+                
+                # Appliquer la fusion et le style bleu
+                table_styles.append(("SPAN", (0, row_idx), (-1, row_idx)))
+                table_styles.append(("BACKGROUND", (0, row_idx), (-1, row_idx), COULEUR_EN_TETE))
+                table_styles.append(("TEXTCOLOR", (0, row_idx), (-1, row_idx), colors.white))
+                table_styles.append(("FONTNAME", (0, row_idx), (-1, row_idx), "Helvetica-Bold"))
+                # Supprimer les lignes verticales parasites sur cette ligne fusionnée
+                table_styles.append(("LINEBEFORE", (0, row_idx), (-1, row_idx), 0, colors.white))
+                table_styles.append(("LINEAFTER", (0, row_idx), (-1, row_idx), 0, colors.white))
 
-                # Lignes de données
+                # 2. Lignes de données
                 for label, attr in mvt_props:
                     row = [label]
                     has_data = False
@@ -266,35 +281,21 @@ class PdfExporter:
                         mvt = action.get_mouvement_pour_combattant(combatant.id)
                         val = str(getattr(mvt, attr, "")) if mvt else ""
                         if val in ["0", "None"]: val = ""
-                        
-                        # Utilisation de Paragraph pour gérer le retour à la ligne automatique
                         row.append(Paragraph(val, styles["corps"]))
                         if val.strip(): has_data = True
                     
                     if has_data:
                         table_data.append(row)
 
-            # Calcul des largeurs (PageWidth - marges / nombre de colonnes)
             available_width = page_size[0] - 3 * cm
             col_widths = [2.5 * cm] + [(available_width - 2.5 * cm) / len(segment)] * len(segment)
 
             table = Table(table_data, colWidths=col_widths, repeatRows=1)
-            
-            # Style appliqué au segment
-            table.setStyle(TableStyle([
-                ("BACKGROUND", (0, 0), (-1, 0), COULEUR_EN_TETE),
-                ("TEXTCOLOR", (0, 0), (-1, 0), colors.white),
-                ("FONTNAME", (0, 0), (-1, 0), "Helvetica-Bold"),
-                ("GRID", (0, 0), (-1, -1), 0.5, COULEUR_BORD),
-                ("BACKGROUND", (0, 1), (-1, 1), colors.whitesmoke), # Ligne combattant
-                ("FONTSIZE", (0, 0), (-1, -1), 7),
-                ("VALIGN", (0, 0), (-1, -1), "MIDDLE"),
-            ]))
+            table.setStyle(TableStyle(table_styles))
             
             story.append(table)
             story.append(Spacer(1, 0.5 * cm))
             
-            # Si on a encore des actions, on force un saut de page pour le bloc suivant
             if i + SEUIL_ACTIONS < len(ordered_actions):
                 story.append(PageBreak())
 
