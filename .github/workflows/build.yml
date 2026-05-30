@@ -27,17 +27,17 @@ jobs:
       - name: Build with PyInstaller
         run: |
           cd choregraphie_editor
-          # On compile en mode --onefile
-          pyinstaller --noconfirm --onefile --windowed --name "EditeurChore" main.py
+          # On utilise --onedir pour créer un dossier au lieu d'un seul fichier
+          pyinstaller --noconfirm --onedir --windowed --name "EditeurChore" main.py
           
-          # On copie les fichiers nécessaires dans le dossier dist/
-          # Cela fonctionnera sur Windows, Linux et macOS
-          cp OptionsMouvements.csv dist/
-          cp dark.qss dist/
-          cp light.qss dist/
+          # On copie les fichiers de config dans le dossier créé par PyInstaller
+          # Le dossier généré s'appelle 'dist/EditeurChore'
+          cp OptionsMouvements.csv dist/EditeurChore/
+          cp dark.qss dist/EditeurChore/
+          cp light.qss dist/EditeurChore/
 
       - name: Upload Artifacts
         uses: actions/upload-artifact@v4
         with:
           name: build-${{ matrix.os }}
-          path: choregraphie_editor/dist/
+          path: choregraphie_editor/dist/EditeurChore/
