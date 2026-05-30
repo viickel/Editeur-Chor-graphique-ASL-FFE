@@ -1,7 +1,25 @@
-shell.nix
+# Fichiers Python
 __pycache__/
 *.pyc
+*.pyo
+*.pyd
+
+# Dossiers de build et distribution
 build/
 dist/
+*.egg-info/
+
+# Environnements virtuels
 .venv/
+env/
+venv/
+
+# Systèmes et outils
 .DS_Store
+.vscode/
+.idea/
+.env
+
+# Si tu utilises Nix, ajoute aussi :
+result
+.direnv/
