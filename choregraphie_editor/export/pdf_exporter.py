@@ -76,7 +76,7 @@ class PdfExporter:
         page_size = cls._resolve_page_size(page_size_str)
 
         # Marges du document
-        margin_h = 1.5 * cm
+        margin_h = 1.2 * cm
         margin_v = 1.8 * cm
 
         # Créer le document ReportLab
@@ -121,11 +121,15 @@ class PdfExporter:
         page_width = page_size[0]
 
         # Titre principal
-        story.append(Spacer(1, 1.5 * cm))
+        story.append(Spacer(1, 0.2 * cm))
         story.append(Paragraph(
             projet.titre or "Chorégraphie sans titre",
             styles["titre_principal"]
         ))
+
+        # Ajouter un petit espace entre le titre et le sous-titre
+        story.append(Spacer(1, 0.3 * cm))
+
 
         # Sous-titre : Club
         if projet.nom_du_club:
