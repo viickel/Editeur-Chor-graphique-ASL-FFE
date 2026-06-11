@@ -2,6 +2,12 @@
 
 Bienvenue sur le dépôt officiel de l'Éditeur de Projet Chorégraphique. Cet outil vous permet de structurer, personnaliser et exporter vos chorégraphies et enchaînements (conçu pour les normes ASL-FFE, il reste parfaitement adaptable à l'escrime artistique).
 
+
+## 📖 Documentation
+Pour apprendre à utiliser l'éditeur, consultez notre guide détaillé :
+**[👉 Lire le manuel d'utilisation](Manuel/manuel_choregraphie.md)**
+
+
 Cette nouvelle version est entièrement réécrite en Python pour offrir une expérience fluide sur Windows, macOS et Linux.
 # 🚀 Quoi de neuf en V2.0 ?
 
