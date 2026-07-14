@@ -173,9 +173,9 @@ class MainWindow(QMainWindow):
 
         # Zone d'intrigue
         intrigue_layout = QVBoxLayout()
-        intrigue_layout.addWidget(QLabel("Intrigue :"))
+        intrigue_layout.addWidget(QLabel("Information (intrigue, musiques ...) :"))
         self.edit_intrigue = QTextEdit()
-        self.edit_intrigue.setPlaceholderText("Décrivez l'intrigue de la chorégraphie...")
+        self.edit_intrigue.setPlaceholderText("Décrivez l'intrigue de la chorégraphie, les musiques et toutes les informations pertinentes...")
         intrigue_layout.addWidget(self.edit_intrigue)
         layout.addLayout(intrigue_layout, stretch=3)
 
@@ -211,7 +211,7 @@ class MainWindow(QMainWindow):
         splitter.addWidget(combattants_group)
 
         # --- Panneau Assistants ---
-        assistants_group = QGroupBox("Assistants Plateau")
+        assistants_group = QGroupBox("Assistants/Figurants")
         a_layout = QVBoxLayout(assistants_group)
 
         self.list_assistants = QListWidget()
