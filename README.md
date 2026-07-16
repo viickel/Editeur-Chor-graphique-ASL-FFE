@@ -5,7 +5,7 @@ Bienvenue sur le dépôt officiel de l'Éditeur de Projet Chorégraphique. Cet o
 
 ## 📖 Documentation
 Pour apprendre à utiliser l'éditeur, consultez notre guide détaillé :
-**[👉 Lire le manuel d'utilisation](Manuel/manuel_choregraphie.md)**
+**[👉 Lire le wiki d'utilisation]([Manuel/manuel_choregraphie.md](https://github.com/viickel/Editeur-Chor-graphique-ASL-FFE/wiki))**
 
 
 ## 🚀 Téléchargement
